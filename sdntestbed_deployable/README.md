@@ -114,21 +114,21 @@ apache-tomcat-6.0.44-green\webapps\sdn\WEB-INF\classes\constans.properties:
 
 1. run rpcserver.py in python/novaconsole-master/ at all OpenStack compute node as agent deamon to interact with ovs
 
-    screen python rpcserver.py –host=local ip addr –port=12345
+        screen python rpcserver.py –host=local ip addr –port=12345
 
 2. create config instance in OpenStack, run sshserver.py in novaconsole-master/novacondole/ at config instance as agent deamon to interact with created host
 
-    screen python sshserver.py –host=local ip addr –port=56789
+        screen python sshserver.py –host=local ip addr –port=56789
 
 3. creating bridge v as tunnel between two compute node, check the bridge v whether have been created by conducting command of ovs-vsctl show in compute node
 
-    ovs-vsctl del-br v
-    ovs-vsctl add-br v
-    ovs-vsctl add-port v v-tun -- set interface v-tun type=gre options:df_default=true options:in_key=flow options:local_ip=src_ip options:out_key=flow options:remote_ip=dst_ip
+        ovs-vsctl del-br v
+        ovs-vsctl add-br v
+        ovs-vsctl add-port v v-tun -- set interface v-tun type=gre options:df_default=true options:in_key=flow options:local_ip=src_ip options:out_key=flow options:remote_ip=dst_ip
 
-    ovs-vsctl del-br v
-    ovs-vsctl add-br v
-    ovs-vsctl add-port v v-tun -- set interface v-tun type=gre options:df_default=true options:in_key=flow options:local_ip=dst_ip options:out_key=flow options:remote_ip=src_ip
+        ovs-vsctl del-br v
+        ovs-vsctl add-br v
+        ovs-vsctl add-port v v-tun -- set interface v-tun type=gre options:df_default=true options:in_key=flow options:local_ip=dst_ip options:out_key=flow options:remote_ip=src_ip
 
 
 # Credits
