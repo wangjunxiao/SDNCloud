@@ -1,15 +1,15 @@
-#Prerequisites
+# Prerequisites
 
 1. you need to install an eclipse IDE.
 2. insert a java web plugin into your eclipse.
 3. insert a flex builder plugin into your eclipse.
 4. you need to install jdk1.7 32bit version.
 
-#Credits
+# Credits
 
 1. eclipse  2. flex builder 3. jdk
 
-#Source Code Description
+# Source Code Description
 
 flex_src: web frontend project  
 A request process of sending data back to backend:  
@@ -85,7 +85,7 @@ Vnet_UserResourceService: user subnet and user script
 Vnet_WebSocketService: check OpenStack instance whether failed to boot and conduct predefined boot script  
 
 
-#SDN Testbed Guide Book
+# SDN Testbed Guide Book
 
 1. Topology:  
 	1.1 Create, Update, Delete  
