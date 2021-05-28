@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark"    
+			   xmlns:mx="library://ns.adobe.com/flex/mx" width="344" height="300"
+			   close="PopUpManager.removePopUp(this)" backgroundColor="#F2EBEB" 
+			   dropShadowVisible="true" borderVisible="true" borderColor="#CEBCBC">
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	
+	<fx:Declarations>
+		<mx:RemoteObject id="Vnet_UserResourceService" destination="Vnet_UserResourceService" >
+			<mx:method name="usersubnet_FlexToJava" fault="faultHandler(event)" result="usersubnet_FlexToJava_resultHandler(event)"/>	
+			<mx:method name="usersubnet_Update" fault="faultHandler(event)" result="usersubnet_Update_resultHandler(event)"/>	
+			<mx:method name="vnet_subnet_FlexToJava" fault="faultHandler(event)" result="vnet_subnet_FlexToJava_resultHandler(event)"/>	
+		</mx:RemoteObject>
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import flashx.textLayout.operations.PasteOperation;
+			
+			import mx.binding.utils.BindingUtils;
+			import mx.collections.ArrayCollection;
+			import mx.collections.XMLListCollection;
+			import mx.controls.Alert;
+			import mx.core.FlexGlobals;
+			import mx.core.mx_internal;
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			
+			import vo.Vnet_usersubnet;
+			import vo.Vnet_vnet_usersubnet;
+			
+			
+			private var counter:int = 0;
+			protected function usersubnet_FlexToJava_resultHandler(event:ResultEvent):void{
+				counter++;
+				if(counter == 2){
+					counter--;
+					Alert.show("Add operation is completed!","Success");
+				}
+			}
+			protected function usersubnet_Update_resultHandler(event:ResultEvent):void{
+				Alert.show("Edit operation is completed!","Success");
+			}
+			protected function vnet_subnet_FlexToJava_resultHandler(event:ResultEvent):void{
+				counter++;
+				if(counter == 2){
+					counter--;
+					Alert.show("Add operation is completed!","Success");
+				}
+			}
+			protected function faultHandler(event:FaultEvent):void{        
+				Alert.show("Fault:"+event.fault.toString());
+				
+			}
+			
+			protected function button_clickHandler(event:MouseEvent):void
+			{
+				var addr:String = _addr.text.replace(/^\s*|\s*$/g,"").split(" ").join("");
+				var mask:String = _mask.text.replace(/^\s*|\s*$/g,"").split(" ").join("");
+				if(verify_ipv4(addr) && verify_mask(mask)){
+					if(FlexGlobals.topLevelApplication.is_edit == true){
+						FlexGlobals.topLevelApplication.vnet_subnets.getItemAt(FlexGlobals.topLevelApplication.current_index).usersubnet_name = _name.text;
+						FlexGlobals.topLevelApplication.vnet_subnets.getItemAt(FlexGlobals.topLevelApplication.current_index).usersubnet_type = _type.text;
+						FlexGlobals.topLevelApplication.vnet_subnets.getItemAt(FlexGlobals.topLevelApplication.current_index).usersubnet_addr = addr;
+						FlexGlobals.topLevelApplication.vnet_subnets.getItemAt(FlexGlobals.topLevelApplication.current_index).usersubnet_mask = mask;
+						Vnet_UserResourceService.usersubnet_Update(FlexGlobals.topLevelApplication.vnet_subnets.getItemAt(FlexGlobals.topLevelApplication.current_index));
+					}
+					else{
+						var id:String = "usersubnet~" + FlexGlobals.topLevelApplication.vnet_counter_subnet 
+							+"~"+ (new Date).getTime() + "~" + FlexGlobals.topLevelApplication.executor_name;
+						FlexGlobals.topLevelApplication.vnet_counter_subnet++;
+						var subnet:Vnet_usersubnet = new Vnet_usersubnet();
+						subnet.usersubnet_id = id;
+						subnet.usersubnet_addr = _addr.text;
+						subnet.usersubnet_mask = _mask.text;
+						subnet.usersubnet_name = _name.text;
+						subnet.usersubnet_type = _type.text;
+						FlexGlobals.topLevelApplication.vnet_subnets.addItem(subnet);
+						Vnet_UserResourceService.usersubnet_FlexToJava(subnet);
+						var vnet_subnet:Vnet_vnet_usersubnet = new Vnet_vnet_usersubnet(FlexGlobals.topLevelApplication.vnet_vnet.vnet_id, id);
+						FlexGlobals.topLevelApplication.vnet_vnet_subnets.addItem(vnet_subnet);
+						Vnet_UserResourceService.vnet_subnet_FlexToJava(vnet_subnet);
+					}
+					PopUpManager.removePopUp(this);
+				}
+				if(!verify_ipv4(_addr.text)){
+					Alert.show("Subnet_addr is illegal!","Error");
+				}
+				if(!verify_mask(_mask.text)){
+					Alert.show("Subnet_mask is illegal!","Error");
+				}
+			}
+			
+			private function verify_ipv4(ipv4:String):Boolean{
+				var result:Boolean = false;
+				var temp:Array = ipv4.split(".");
+				if(temp.length == 4){
+					if(!isNaN(Number(temp[0])) && !isNaN(Number(temp[1])) && !isNaN(Number(temp[2])) && !isNaN(Number(temp[3])))
+						if(temp[0]!="" && -1<parseInt(temp[0]) && parseInt(temp[0])<256)  
+							if(temp[1]!="" && -1<parseInt(temp[1]) && parseInt(temp[0])<256)  
+								if(temp[2]!="" && -1<parseInt(temp[2]) && parseInt(temp[0])<256)  
+									if(temp[3]!="" && -1<parseInt(temp[3]) && parseInt(temp[0])<256)  
+										result = true; 
+				}
+				return result;
+			}
+			
+			private function verify_mask(mask:String):Boolean{
+				var result:Boolean = false;
+				var temp:Array = mask.split(".");
+				var len:int;
+				for(var i:int=0; i<temp.length; i++){
+					temp[i] = parseInt(temp[i]).toString(2);
+					len = 8-temp[i].length;
+					for(var k:int=0; k<len; k++){
+						temp[i] = "0"+temp[i];
+					}
+				}
+				var bi:String = temp[0] + temp[1] + temp[2] + temp[3];
+				var start:Boolean = false;
+				var stop:Boolean = false;
+				for(var j:int=0; j<bi.length; j++){
+					if(!start && bi.charAt(j) == "1" && j==0){ //1, start = true
+						start = true;
+					}
+					if(start && bi.charAt(j) == "0"){ //meet 0,  stop = true
+						stop = true;
+					}
+					if(stop && bi.charAt(j) == "1"){ //1..0...1
+						return false;
+					}
+					if(!start && bi.charAt(j) == "1"){ //0...1
+						return false;
+					}
+					if(start && stop && bi.charAt(j) == "1"){ //1..0...1
+						return false;
+					}
+					if(j == bi.length-1){
+						if(!start && !stop){ //all 0
+							result = true;
+						}
+						else if(start && !stop){ //all 1
+							result = true;
+						}
+						else if(start && stop){ //1...0....
+							result = true;
+						}
+					}
+				}
+				return result;
+			}
+			
+			private function add_edit_lable():String{
+				var result:String = "";
+				if(FlexGlobals.topLevelApplication.is_edit == true){
+					result = "Edit Subnet";
+				}
+				else{
+					result = "Add Subnet";
+				}
+				return result;
+			}
+			
+			private function showName():String{
+				var result:String = "";
+				if(FlexGlobals.topLevelApplication.is_edit == true){
+					result = FlexGlobals.topLevelApplication.vnet_subnets.getItemAt(FlexGlobals.topLevelApplication.current_index).usersubnet_name;
+				}
+				return result;
+			}
+			
+			private function showType():String{
+				var result:String = "";
+				if(FlexGlobals.topLevelApplication.is_edit == true){
+					result = FlexGlobals.topLevelApplication.vnet_subnets.getItemAt(FlexGlobals.topLevelApplication.current_index).usersubnet_type;
+				}
+				return result;
+			}
+			
+			private function showAddr():String{
+				var result:String = "";
+				if(FlexGlobals.topLevelApplication.is_edit == true){
+					result = FlexGlobals.topLevelApplication.vnet_subnets.getItemAt(FlexGlobals.topLevelApplication.current_index).usersubnet_addr;
+				}
+				return result;
+			}
+			
+			private function showMask():String{
+				var result:String = "";
+				if(FlexGlobals.topLevelApplication.is_edit == true){
+					result = FlexGlobals.topLevelApplication.vnet_subnets.getItemAt(FlexGlobals.topLevelApplication.current_index).usersubnet_mask;
+				}
+				return result;
+			}
+			
+		]]>
+	</fx:Script>
+	
+	
+	<s:Button x="10" y="10" label="{add_edit_lable()}" height="22" width="324"/>
+	<s:VGroup x="13" y="44" width="113" height="60" gap="27" horizontalAlign="right" paddingTop="10">
+		<s:Label text="subnet_name" height="15"/>
+		<s:Label text="subnet_type" height="15"/>
+		<s:Label text="subnet_addr" height="15"/>
+		<s:Label text="subnet_mask" height="15"/>
+	</s:VGroup>
+	<s:VGroup x="166" y="39" width="166" height="160" gap="20" horizontalAlign="left" paddingTop="10">
+		<s:TextInput text="{showName()}" id="_name"/>
+		<s:TextInput text="{showType()}" id="_type"/>
+		<s:TextInput text="{showAddr()}" id="_addr"/>
+		<s:TextInput text="{showMask()}" id="_mask"/>
+	</s:VGroup>
+	<s:Button x="121" y="225" label="Apply" width="100" click="button_clickHandler(event)"/>
+</s:TitleWindow>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Vnet_ofport">
+
+	<typeAlias alias="Vnet_ofport" type="cn.dlut.entity.Vnet_ofport" />
+
+	<resultMap class="Vnet_ofport" id="Vnet_ofport">
+		<result property="ofport_id" column="ofport_id" />
+		<result property="ofport_portnum" column="ofport_portnum" />
+		<result property="ofport_status" column="ofport_status" />
+		
+	</resultMap>
+
+	<select id="getAll" resultClass="Vnet_ofport">
+		select * from vnet_ofport
+	</select>
+	<select id="getAllbyStatus" resultClass="Vnet_ofport">
+		select * from vnet_ofport
+		where ofport_status="ACTIVE"
+	</select>
+	
+	<select id="getById" resultClass="Vnet_ofport" parameterClass="String">
+		select *
+		from vnet_ofport
+		where ofport_id=#ofport_id#
+	</select>
+	
+	<insert id="insertOfport" parameterClass="Vnet_ofport">
+		insert into
+		vnet_ofport(ofport_id,ofport_portnum,ofport_status)
+		values(#ofport_id#,#ofport_portnum#,#ofport_status#)
+	</insert>
+	
+	<update id="updateOfport" parameterClass="Vnet_ofport">
+		update vnet_ofport
+		set ofport_status=#ofport_status#
+		where ofport_id=#ofport_id#
+	</update>
+			
+	<delete id="delById" parameterClass="String">		
+		delete FROM vnet_ofport where ofport_id=#ofport_id#		
+	</delete>
+	
+	<select id="getAllByVnet" resultClass="Vnet_ofport" parameterClass="String">
+		select sdn.vnet_ofport.* from
+			(select sdn.vnet_switch_ofport.* from 
+				(select vnet_vnet_resource.* from
+					sdn.vnet_vnet_resource
+					where sdn.vnet_vnet_resource.vnet_id=#vnet_id#
+   					and vnet_vnet_resource.resource_type='Switch') as A 
+   					inner join sdn.vnet_switch_ofport
+             	    on A.resource_id = vnet_switch_ofport.switch_id) as B
+				inner join sdn.vnet_ofport
+                on B.ofport_id = vnet_ofport.ofport_id
+	</select>
+	
+	
+</sqlMap>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Vnet_usersubnet_userip">
+
+	<typeAlias alias="Vnet_usersubnet_userip" type="cn.dlut.entity.Vnet_usersubnet_userip" />
+
+	<resultMap class="Vnet_usersubnet_userip" id="Vnet_usersubnet_userip">
+		<result property="usersubnet_userip_id" column="usersubnet_userip_id" />
+		<result property="userip_id" column="userip_id" />
+		<result property="usersubnet_id" column="usersubnet_id" />
+
+	</resultMap>
+
+	<select id="getAll" resultClass="Vnet_usersubnet_userip">
+		select * from vnet_usersubnet_userip
+	</select>
+	
+	<select id="getById" resultClass="Vnet_usersubnet_userip" parameterClass="Integer" >
+		select * 
+		from vnet_usersubnet_userip 
+		where usersubnet_userip_id=#usersubnet_userip_id#
+	</select>
+	
+	<insert id="insertUsersubnet_userip" parameterClass="Vnet_usersubnet_userip">
+		insert into
+		vnet_usersubnet_userip(
+		usersubnet_id,userip_id)
+		values(#usersubnet_id#,#userip_id#)
+	</insert>
+	
+	<delete id="delById" parameterClass="Integer">
+		delete 
+		from vnet_usersubnet_userip
+		where usersubnet_userip_id=#usersubnet_userip_id#	
+	</delete>
+	
+</sqlMap>

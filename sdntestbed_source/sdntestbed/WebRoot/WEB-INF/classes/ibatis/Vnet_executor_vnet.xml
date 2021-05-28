@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Vnet_executor_vnet">
+
+	<typeAlias alias="Vnet_executor_vnet" type="cn.dlut.entity.Vnet_executor_vnet" />
+
+	<resultMap class="Vnet_executor_vnet" id="Vnet_executor_vnet">
+		<result property="executor_vnet_id" column="executor_vnet_id" />
+		<result property="executor_id" column="executor_id" />
+		<result property="vnet_id" column="vnet_id" />
+	</resultMap>
+
+	<select id="getAll" resultClass="Vnet_executor_vnet">
+		select * from vnet_executor_vnet
+	</select>
+	
+	<select id="getById" resultClass="Vnet_executor_vnet" parameterClass="Integer" >
+		select * from vnet_executor_vnet where executor_vnet_id=#executor_vnet_id#
+	</select>
+	
+	<insert id="insertExecutor_vnet" parameterClass="Vnet_executor_vnet">
+		insert into
+		vnet_executor_vnet(executor_id,vnet_id)
+		values(#executor_id#,#vnet_id#)
+	</insert>
+	
+	<delete id="delById" parameterClass="Integer">
+		delete from vnet_executor_vnet  where executor_vnet_id=#executor_vnet_id#	
+	</delete>
+	
+	<delete id="delByVnet_id" parameterClass="String">
+		delete from vnet_executor_vnet  where vnet_id=#vnet_id#	
+	</delete>
+	
+	<select id="getVnetByexe_id" resultClass="Vnet_vnet" parameterClass="Integer" >
+		select sdn.vnet_vnet.* from
+		(select * from sdn.vnet_executor_vnet
+		where sdn.vnet_executor_vnet.executor_id=#exe_id#) as A inner join sdn.vnet_vnet
+		on A.vnet_id=sdn.vnet_vnet.vnet_id
+	</select>
+	
+	<select id="getByexe_id" resultClass="Vnet_executor_vnet" parameterClass="Integer" >
+		select * from sdn.vnet_executor_vnet
+		where sdn.vnet_executor_vnet.executor_id=#exe_id#
+	</select>
+	
+</sqlMap>

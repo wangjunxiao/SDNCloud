@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Vnet_tunofport">
+
+	<typeAlias alias="Vnet_tunofport" type="cn.dlut.entity.Vnet_tunofport" />
+
+	<resultMap class="Vnet_tunofport" id="Vnet_tunofport">
+		<result property="tunofport_id" column="tunofport_id" />
+		<result property="tunofport_portnum" column="tunofport_portnum" />
+		<result property="tunofport_status" column="tunofport_status" />
+	
+
+	</resultMap>
+
+	<select id="getAll" resultClass="Vnet_tunofport">
+		select * from vnet_tunofport
+	</select>
+	
+	<select id="getById" resultClass="Vnet_tunofport" parameterClass="String" >
+		select * from vnet_tunofport where tunofport_id=#tunofport_id#
+	</select>
+	
+	<insert id="insertTunofport" parameterClass="Vnet_tunofport">
+		insert into
+		vnet_tunofport(tunofport_id,tunofport_portnum,tunofport_status)
+		values(#tunofport_id#,#tunofport_portnum#,#tunofport_status#)
+	</insert>
+	
+	<update id="updatePortNum" parameterClass="Vnet_tunofport">
+		update vnet_tunofport
+		set tunofport_portnum=#tunofport_portnum#
+		where tunofport_id=#tunofport_id#
+		
+	</update>
+	
+	<delete id="delById" parameterClass="String">
+		delete from vnet_tunofport where tunofport_id=#tunofport_id#	
+	</delete>
+	
+</sqlMap>

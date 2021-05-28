@@ -1,0 +1,14 @@
+SET SQL_SAFE_UPDATES = 0;
+delete FROM nova.block_device_mapping;
+delete FROM nova.instance_actions_events;
+delete FROM nova.instance_actions;
+delete FROM nova.instance_extra;
+delete FROM nova.instance_faults;
+delete FROM nova.instance_id_mappings;
+delete FROM nova.instance_info_caches;
+delete FROM nova.instance_system_metadata;
+delete FROM nova.instance_type_projects;
+delete FROM nova.instances;
+delete FROM nova.security_group_instance_association;
+delete FROM nova.reservations;
+delete FROM nova.task_log;	

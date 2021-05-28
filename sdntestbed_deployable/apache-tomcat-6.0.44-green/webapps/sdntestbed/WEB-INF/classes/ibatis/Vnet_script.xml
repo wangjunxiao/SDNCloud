@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Vnet_script">
+
+	<typeAlias alias="Vnet_script" type="cn.dlut.entity.Vnet_script" />
+
+	<resultMap class="Vnet_script" id="Vnet_script">
+		<result property="userscript_id" column="userscript_id" />
+        <result property="userscript_name" column="userscript_name" />
+        <result property="userscript_type" column="userscript_type" />
+        <result property="userscript_content" column="userscript_content" />
+
+	</resultMap>
+
+	<select id="getAll" resultClass="Vnet_script">
+		select * from vnet_userscript
+	</select>
+	
+	<select id="getById" resultClass="Vnet_script" parameterClass="String" >
+		select * 
+		from vnet_userscript 
+		where userscript_id=#userscript_id#
+	</select>
+	
+	<insert id="insertUserscript" parameterClass="Vnet_script">
+		insert into
+		vnet_userscript(
+		userscript_id,userscript_name,userscript_type,userscript_content)
+		values(#userscript_id#,#userscript_name#,#userscript_type#,#userscript_content#)
+	</insert>
+	
+	<delete id="delById" parameterClass="String">
+		delete 
+		from vnet_userscript
+		where userscript_id=#userscript_id#	
+	</delete>
+	
+</sqlMap>

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Vnet_osport">
+
+	<typeAlias alias="Vnet_osport" type="cn.dlut.entity.Vnet_osport" />
+
+	<resultMap class="Vnet_osport" id="Vnet_osport">
+		<result property="osport_id" column="osport_id" />
+		<result property="osport_osid" column="osport_osid" />
+		<result property="osport_name" column="osport_name" />
+		<result property="osport_type" column="osport_type" />
+		<result property="ip_id" column="ip_id" />
+		<result property="osport_status" column="osport_status" />
+	</resultMap>
+
+	<select id="getAll" resultClass="Vnet_osport">
+		select * from vnet_osport
+	</select>
+	
+	<select id="getById" resultClass="Vnet_osport" parameterClass="String">
+		select *
+		from vnet_osport
+		where osport_id=#osport_id#
+	</select>
+	
+	<insert id="insertOsport" parameterClass="Vnet_osport">
+		insert into
+		vnet_osport(osport_id,osport_osid,osport_name,osport_type,osport_status,ip_id)
+		values(#osport_id#,#osport_osid#,#osport_name#,#osport_type#,#osport_status#,#ip_id#)
+	</insert>
+	
+	<update id="updateOsport" parameterClass="Vnet_osport">
+		update vnet_osport
+		set osport_status=#osport_status#
+		where osport_id=#osport_id#
+	</update>
+	
+	<update id="updateTypeIP" parameterClass="Vnet_osport">
+		update vnet_osport
+		set ip_id=#ip_id#,
+			osport_type=#osport_type#
+		where osport_id=#osport_id#
+	</update>
+	
+	<delete id="delById" parameterClass="String">
+		delete FROM vnet_osport where osport_id=#osport_id#
+		
+	</delete>
+	
+	<select id="getbyOsid" resultClass="Vnet_osport" parameterClass="String">
+		select * from vnet_osport where osport_osid=#osport_osid#
+	</select>
+	
+	<select id="getOsportOsid_by_host_id" resultClass="String" parameterClass="String">
+		select vnet_osport.osport_osid from 
+			(select vnet_instance_osport.osport_id from 
+				(select * from sdn.vnet_instance_host
+				where vnet_instance_host.host_id=#host_id#) as A
+		inner join sdn.vnet_instance_osport
+		on A.instance_id=vnet_instance_osport.instance_id) as B 
+		inner join sdn.vnet_osport 
+		on B.osport_id=vnet_osport.osport_id
+
+	</select>
+	
+	
+	
+	
+	<select id="getbyHostid" resultClass="Vnet_osport" parameterClass="String">
+		select vnet_osport.* from 
+			(select vnet_instance_osport.osport_id from 
+				(select * from sdn.vnet_instance_host
+				where vnet_instance_host.host_id=#host_id#) as A
+		inner join sdn.vnet_instance_osport
+		on A.instance_id=vnet_instance_osport.instance_id) as B 
+		inner join sdn.vnet_osport 
+		on B.osport_id=vnet_osport.osport_id 
+
+	</select>
+	
+	<select id="getbyConid" resultClass="Vnet_osport" parameterClass="String">
+		select vnet_osport.* from 
+			(select vnet_instance_osport.osport_id from 
+				(select * from sdn.vnet_instance_controller
+				where vnet_instance_controller.controller_id=#con_id#) as A
+		inner join sdn.vnet_instance_osport
+		on A.instance_id=vnet_instance_osport.instance_id) as B 
+		inner join sdn.vnet_osport 
+		on B.osport_id=vnet_osport.osport_id 
+
+	</select>
+</sqlMap>

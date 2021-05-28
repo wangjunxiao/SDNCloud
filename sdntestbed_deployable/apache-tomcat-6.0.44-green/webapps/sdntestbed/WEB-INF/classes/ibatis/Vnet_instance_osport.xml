@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Vnet_instance_osport">
+
+	<typeAlias alias="Vnet_instance_osport" type="cn.dlut.entity.Vnet_instance_osport" />
+
+	<resultMap class="Vnet_instance_osport" id="Vnet_instance_osport">
+		<result property="instance_osport_id" column="instance_osport_id" />
+		<result property="instance_id" column="instance_id" />
+		<result property="osport_id" column="osport_id" />
+
+	</resultMap>
+
+	<select id="getAll" resultClass="Vnet_instance_osport">
+		select * from vnet_instance_osport
+	</select>
+	
+	<select id="getById" resultClass="Vnet_instance_osport" parameterClass="Integer" >
+		select * 
+		from vnet_instance_osport 
+		where instance_osport_id=#instance_osport_id#
+	</select>
+	
+	<select id="Vnet_instance_osport" resultClass="Vnet_instance_osport" parameterClass="String">
+		select * 
+		from vnet_instance_osport
+		where instance_id=#instance_id#
+	</select>
+	
+	<insert id="insertInstanceOsport" parameterClass="Vnet_instance_osport">
+		insert into
+		vnet_instance_osport(instance_id,osport_id)
+		values(#instance_id#,#osport_id#)
+	</insert>
+	
+	
+	<delete id="delById" parameterClass="Integer">
+		delete 
+		from vnet_instance_osport
+		where instance_osport_id=#instance_osport_id#	
+	</delete>
+	
+	
+	<select id="getByInstance_id" resultClass="Vnet_instance_osport" parameterClass="String">
+		select * 
+		from vnet_instance_osport
+		where instance_id=#instance_id#
+	</select>
+	
+	<select id="getOsport_id_by_hostid" resultClass="String" parameterClass="String">
+		select vnet_instance_osport.osport_id
+		from vnet_instance_osport,vnet_instance_host
+		where vnet_instance_host.host_id=#host_id#
+		and vnet_instance_osport.instance_id=vnet_instance_host.instance_id
+	</select>
+</sqlMap>

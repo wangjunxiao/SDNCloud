@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Vnet_request">
+
+	<typeAlias alias="Vnet_request" type="cn.dlut.entity.Vnet_request" />
+
+	<resultMap class="Vnet_request" id="Vnet_request">
+		<result property="request_id" column="request_id" />
+		<result property="request_name" column="request_name" />
+		<result property="request_type" column="request_type" />
+		<result property="content_id" column="content_id" />
+		<result property="request_status" column="request_status" />
+		<result property="vnet_id" column="vnet_id" />
+		<result property="request_group" column="request_group" />
+		<result property="request_timestamp" column="request_timestamp" />
+	</resultMap>
+
+	<select id="getAll" resultClass="Vnet_request">
+		select * from vnet_request
+	</select>
+	
+	<select id="getById" resultClass="Vnet_request" parameterClass="Integer">
+		select *
+		from vnet_request
+		where request_id=#request_id#
+	</select>
+	
+	<insert id="insert" parameterClass="Vnet_request">
+		insert into
+		vnet_request(request_name,request_type,content_id,request_status,vnet_id,request_group,request_timestamp)
+		values(#request_name#,#request_type#,#content_id#,#request_status#,#vnet_id#,#request_group#,#request_timestamp#)
+		<selectKey resultClass="int" keyProperty="request_id" >
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	
+	<delete id="delById" parameterClass="Integer">
+		delete from vnet_request
+		where
+		request_id=#request_id#
+	</delete>
+	
+	<update id="update" parameterClass="Vnet_request">
+		update vnet_request
+		set request_status=#request_status#
+		where request_id=#request_id#
+	</update>
+
+</sqlMap>

@@ -1,0 +1,62 @@
+<root>
+  <node id="1" name="H1"  type="host" />
+  <node id="2" name="H2"  type="host" />
+  <node id="3" name="H3"  type="host" />
+  <node id="4" name="H4"  type="host" />
+  <node id="5" name="H5"  type="host" />
+  <node id="6" name="H6"  type="host" />
+  <node id="7" name="H7"  type="host" />
+  <node id="8" name="H8"  type="host" />
+           
+  <node id="9" name="S9"     type="switch" />
+  <node id="10" name="S10"    type="switch" />
+  <node id="11" name="S11"    type="switch" />
+  <node id="12" name="S12"    type="switch" />
+  <node id="13" name="S13"    type="switch" />
+  <node id="14" name="S14"    type="switch" />
+  <node id="15" name="S15"    type="switch" />
+  <node id="16" name="S16"    type="switch" />
+  <node id="17" name="S17"    type="switch" />
+  <node id="18" name="S18"   type="switch" />
+  
+  <node id="19" name="C19"    type="controller" />
+ 
+  <link id="1" fromNode="1" toNode="9" />
+  <link id="2" fromNode="2" toNode="9" />
+  <link id="3" fromNode="3" toNode="10" />
+  <link id="4" fromNode="4" toNode="10" />
+  <link id="5" fromNode="5" toNode="11" />
+  <link id="6" fromNode="6" toNode="11" />
+  <link id="7" fromNode="7" toNode="12" />
+  <link id="8" fromNode="8" toNode="12" />
+  
+  <link id="9" fromNode="9" toNode="13" />
+  <link id="10" fromNode="9" toNode="14" />
+  <link id="11" fromNode="10" toNode="13" />
+  <link id="12" fromNode="10" toNode="14" />
+  
+  <link id="13" fromNode="11" toNode="15" />
+  <link id="14" fromNode="11" toNode="16" />
+  <link id="15" fromNode="12" toNode="15" />
+  <link id="16" fromNode="12" toNode="16" />
+  
+  <link id="17" fromNode="17" toNode="13" />
+  <link id="18" fromNode="17" toNode="14" />
+  <link id="19" fromNode="17" toNode="15" />
+  <link id="20" fromNode="17" toNode="16" />
+  <link id="21" fromNode="18" toNode="13" />
+  <link id="22" fromNode="18" toNode="14" />
+  <link id="23" fromNode="18" toNode="15" />
+  <link id="24" fromNode="18" toNode="16" />
+  
+  <link id="25" fromNode="17" toNode="19" />
+  <link id="26" fromNode="18" toNode="19" />
+  <link id="27" fromNode="16" toNode="19" />
+  <link id="28" fromNode="15" toNode="19" />
+  <link id="29" fromNode="14" toNode="19" />
+  <link id="30" fromNode="13" toNode="19" />
+  <link id="31" fromNode="12" toNode="19" />
+  <link id="32" fromNode="11" toNode="19" />
+  <link id="33" fromNode="10" toNode="19" />
+  <link id="34" fromNode="9" toNode="19" />
+</root>

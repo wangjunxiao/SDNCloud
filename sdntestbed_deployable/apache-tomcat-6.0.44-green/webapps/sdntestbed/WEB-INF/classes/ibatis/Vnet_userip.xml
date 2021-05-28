@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Vnet_userip">
+
+	<typeAlias alias="Vnet_userip" type="cn.dlut.entity.Vnet_userip" />
+
+	<resultMap class="Vnet_userip" id="Vnet_userip">
+		<result property="userip_id" column="userip_id" />
+        <result property="userip_addr" column="userip_addr" />
+        <result property="userip_mask" column="userip_mask" />
+        <result property="host_id" column="host_id" />
+        <result property="osport_id" column="osport_id" />
+	</resultMap>
+
+	<select id="getAll" resultClass="Vnet_userip">
+		select * from vnet_userip
+	</select>
+	
+	<select id="getById" resultClass="Vnet_userip" parameterClass="String" >
+		select * 
+		from vnet_userip 
+		where userip_id=#userip_id#
+	</select>
+	
+	<insert id="insertUserip" parameterClass="Vnet_userip">
+		insert into
+		vnet_userip(
+		userip_id,userip_addr,userip_mask,host_id,osport_id)
+		values(#userip_id#,#userip_addr#,#userip_mask#,#host_id#,#osport_id#)
+	</insert>
+	
+	<update id="updateOsport_id" parameterClass="Vnet_userip">
+		update vnet_userip
+		set osport_id=#osport_id#
+		where userip_id=#userip_id#
+	</update>
+	
+	<delete id="delById" parameterClass="String">
+		delete 
+		from vnet_userip
+		where userip_id=#userip_id#	
+	</delete>
+	
+</sqlMap>

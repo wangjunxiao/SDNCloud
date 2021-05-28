@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE project [<!ENTITY buildfile SYSTEM "file:./build-user.xml">]>
+
+<project basedir="." default="war" name="sdntestbed">
+
+	<property name="PRJ.WEB" value="WebRoot" />
+	<property name="PRJ.WAR.NAME" value="sdntestbed"></property>
+	<property name="PRJ.SRC" value="src" />
+	<property name="PRJ.SRC.CONF" value="src/conf" />
+	<property name="PRJ.SRC.JAVA" value="src/java" />
+	<property name="PRJ.BIN" value="dist" />
+	<property name="PRJ.TEMP" value="temp" />
+
+	<property name="PRJ.deploy" value="D:\apache-tomcat-6.0.44-green\webapps" />
+
+	<target name="init">
+
+		<echo message="${PRJ.WEB} ${PRJ.SRC} ${PRJ.BIN} ${PRJ.TEMP}" />
+		<echo message="-------------- Initalizing ---------------" />
+
+                <mkdir dir="${PRJ.TEMP}"/>
+                <mkdir dir="${PRJ.BIN}"/>
+		<delete includeemptydirs="true" verbose="true">
+			<fileset dir="${PRJ.TEMP}">
+				<include name="**/*" />
+			</fileset>
+		</delete>
+		<delete includeemptydirs="true" verbose="true">
+			<fileset dir="${PRJ.BIN}">
+				<include name="**/*" />
+			</fileset>
+		</delete>
+
+		<mkdir dir="${PRJ.TEMP}/src" />
+		<mkdir dir="${PRJ.TEMP}/cls" />
+		<mkdir dir="${PRJ.TEMP}/web" />
+
+		<echo message="Cleaning..." />
+
+		<copy todir="${PRJ.TEMP}/src">
+			<fileset dir="${PRJ.SRC}">
+				<include name="*.java" />
+				<include name="*.xml" />
+				<include name="*.properties" />
+			</fileset>
+			<fileset dir="${PRJ.SRC.CONF}">
+				<include name="**/*.xml" />
+				<include name="**/*.properties" />
+			</fileset>
+			<fileset dir="${PRJ.SRC.JAVA}">
+				<include name="**/*.java" />
+				<include name="**/*.xml" />
+				<include name="**/*.properties" />
+			</fileset>
+		</copy>
+
+		<copy todir="${PRJ.TEMP}/web/WEB-INF/lib">
+			<fileset dir="${PRJ.WEB}/WEB-INF/lib">
+				<include name="*.jar" />
+			</fileset>
+		</copy>
+
+		<copy todir="${PRJ.TEMP}/cls">
+			<fileset dir="${PRJ.TEMP}/src">
+				<include name="**/*.xml" />
+				<include name="**/*.properties" />
+			</fileset>
+		</copy>
+
+	</target>
+
+	<target name="build" depends="init">
+		<echo message="Building... " />
+		<javac srcdir="${PRJ.TEMP}/src" destdir="${PRJ.TEMP}/cls" debug="true" encoding="UTF-8">
+			<classpath>
+				<fileset dir="${PRJ.TEMP}/web/WEB-INF/lib">
+					<include name="*.jar" />
+				</fileset>
+			</classpath>
+		</javac>
+	</target>
+
+	<target name="archive" depends="build">
+		<copy todir="${PRJ.TEMP}/web/WEB-INF/classes">
+			<fileset dir="${PRJ.TEMP}/cls">
+				<include name="**/*.class" />
+				<include name="**/*.xml" />
+				<include name="**/*.properties" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="war" depends="archive">
+		<delete includeemptydirs="true" verbose="true">
+			<fileset dir="${PRJ.BIN}">
+				<include name="**/*" />
+			</fileset>
+		</delete>		
+		<war compress="false" destfile="${PRJ.BIN}/${PRJ.WAR.NAME}.war" webxml="${PRJ.WEB}/WEB-INF/web.xml">
+			<fileset dir="${PRJ.WEB}">
+				<exclude name="WEB-INF/classes/**/*" />
+				<exclude name="WEB-INF/lib/*" />
+			</fileset>			
+			<fileset dir="${PRJ.TEMP}/web">				
+				<include name="WEB-INF/**/*.*" />
+			</fileset>			
+		</war>		
+	</target>
+	<target name="deploy" depends="archive">
+		<delete includeemptydirs="true" verbose="true">
+			<fileset dir="${PRJ.BIN}">
+				<include name="**/*" />
+			</fileset>
+		</delete>		
+		<copy todir="${PRJ.deploy}">
+			<fileset dir="${PRJ.WEB}">
+				<exclude name="WEB-INF/classes/**/*" />
+				<exclude name="WEB-INF/lib/*" />
+			</fileset>			
+			<fileset dir="${PRJ.TEMP}/web">				
+				<include name="WEB-INF/**/*.*" />
+			</fileset>			
+		</copy>		
+	</target>
+
+	<target name="deploy_war" depends="war">
+		<copy todir="${PRJ.deploy}">
+			<fileset dir="${PRJ.BIN}">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+	</target>
+
+</project>

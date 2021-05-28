@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<utils:MyTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					 xmlns:s="library://ns.adobe.com/flex/spark" 
+					 xmlns:mx="library://ns.adobe.com/flex/mx"
+					 xmlns:utils="utils.*"
+					 xmlns:cdg="view.*"
+					 layout="vertical"
+					 initialize="init()" width="800" height="500" 
+					 close="this.parent.removeChild(this)" showCloseButton="true"
+					 verticalScrollPolicy="auto" horizontalScrollPolicy="auto" dropShadowVisible="true">
+	
+	<fx:Declarations>
+		<s:RemoteObject id="Vnet_JavaToFlexService" destination="Vnet_JavaToFlexService" >
+			<s:method name="usersubnet_JavaToFlex" fault="faultHandler(event)" result="usersubnetJavaToFlex_resultHandler(event)"/>
+		</s:RemoteObject>
+		
+		<s:RemoteObject id="Vnet_UserResourceService" destination="Vnet_UserResourceService" >
+			<s:method name="usersubnet_Delete" fault="faultHandler(event)" result="usersubnet_Delete_resultHandler(event)"/>
+		</s:RemoteObject>
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.collections.ArrayList;
+			import mx.controls.Alert;
+			import mx.controls.Menu;
+			import mx.core.FlexGlobals;
+			import mx.events.ListEvent;
+			import mx.events.MenuEvent;
+			import mx.managers.PopUpManager;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			
+			import spark.events.IndexChangeEvent;
+			
+			import utils.KeepOnly;
+			
+			import vo.Vnet_usersubnet;
+			
+			
+			private var is_itemclick:Boolean = false;
+			
+			
+			protected function usersubnet_Delete_resultHandler(event:ResultEvent):void{
+				Alert.show("Delete success!");
+			}
+			
+			protected function usersubnetJavaToFlex_resultHandler(event:ResultEvent):void{
+				FlexGlobals.topLevelApplication.vnet_subnets = event.result as ArrayCollection;
+				this.addEventListener(Event.RESIZE, titleWindowResized);
+				FlexGlobals.topLevelApplication.vnet_counter_subnet = FlexGlobals.topLevelApplication.vnet_subnets.length;
+			}
+			protected function faultHandler(event:FaultEvent):void{        
+				Alert.show("Fault:"+event.fault.toString());
+				
+			}
+			
+			protected function init():void{
+				Vnet_JavaToFlexService.usersubnet_JavaToFlex();
+				this.title = "Subnet List";
+			}
+			
+			protected function titleWindowResized(event:Event):void{
+				
+				this.addEventListener(MouseEvent.MOUSE_UP, resizeCompleted);
+			}
+			
+			protected function resizeCompleted(event:MouseEvent):void{
+				
+				this.removeEventListener(MouseEvent.MOUSE_UP, resizeCompleted);
+			}
+			
+			private function addHandler(event:MouseEvent):void{
+				FlexGlobals.topLevelApplication.is_edit = false;
+				var myPanel:Vnet_add_editSubnetWindow = 
+					Vnet_add_editSubnetWindow(PopUpManager.createPopUp(this, Vnet_add_editSubnetWindow, true)); 
+				myPanel.x = 420;
+				myPanel.y = 170;
+			}
+			
+			private function itemDoubleClickHandler(event:ListEvent):void{
+				is_itemclick = true;
+				FlexGlobals.topLevelApplication.current_index = event.rowIndex;
+			}
+			
+			private function menuHandler(event:MenuEvent):void {	
+				if(event.item.label=="Edit"){
+					FlexGlobals.topLevelApplication.is_edit = true;
+					var myPanel:Vnet_add_editSubnetWindow = 
+						Vnet_add_editSubnetWindow(PopUpManager.createPopUp(this, Vnet_add_editSubnetWindow, true)); 
+					myPanel.x = 420;
+					myPanel.y = 170;
+				}
+				if(event.item.label=="Delete"){
+					Vnet_UserResourceService.usersubnet_Delete(FlexGlobals.topLevelApplication.vnet_subnets[FlexGlobals.topLevelApplication.current_index].usersubnet_id);
+					FlexGlobals.topLevelApplication.vnet_subnets.removeItemAt(FlexGlobals.topLevelApplication.current_index);
+				}
+			}
+			
+			protected function showMenu(event:MouseEvent):void{
+				if(is_itemclick){
+					var menuData:Array = [{label:'Edit'}, {label:'Delete'}];
+					var myMenu:Menu = Menu.createMenu(this,menuData, false);
+					myMenu.addEventListener("itemClick", menuHandler); 
+					myMenu.show(event.stageX, event.stageY);
+					is_itemclick = false;
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	
+	
+	<s:Button id="add" label="Add" fontWeight="bold" click="addHandler(event)"/>
+	<mx:DataGrid id="listDG" width="100%" height="100%" dataProvider="{FlexGlobals.topLevelApplication.vnet_subnets}" doubleClick="showMenu(event)"
+				 itemDoubleClick="itemDoubleClickHandler(event)" doubleClickEnabled="true">
+		<mx:columns>
+			<mx:DataGridColumn dataField="usersubnet_name" headerText="subnet_name"></mx:DataGridColumn>
+			<mx:DataGridColumn dataField="usersubnet_type" headerText="subnet_type"></mx:DataGridColumn>
+			<mx:DataGridColumn dataField="usersubnet_addr" headerText="subnet_addr"></mx:DataGridColumn>
+			<mx:DataGridColumn dataField="usersubnet_mask" headerText="subnet_mask"></mx:DataGridColumn>
+		</mx:columns>
+	</mx:DataGrid>
+	
+</utils:MyTitleWindow>

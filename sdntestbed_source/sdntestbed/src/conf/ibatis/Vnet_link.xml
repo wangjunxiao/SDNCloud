@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Vnet_link">
+
+	<typeAlias alias="Vnet_link" type="cn.dlut.entity.Vnet_link" />
+
+	<resultMap class="Vnet_link" id="Vnet_link">
+		<result property="link_id" column="link_id" />
+		<result property="link_bandwidth" column="link_bandwidth" />
+		<result property="link_src_id" column="link_src_id" />
+		<result property="link_src_type" column="link_src_type" />
+		<result property="link_dst_id" column="link_dst_id"/>
+		<result property="link_dst_type" column="link_dst_type" />
+		<result property="link_ofport_src" column="link_ofport_src" />
+		<result property="link_ofport_dst" column="link_ofport_dst" />
+		<result property="link_iscross" column="link_iscross" />
+		<result property="link_tunofport_src" column="link_tunofport_src" />
+		<result property="link_tunofport_dst" column="link_tunofport_dst" />
+		<result property="tun_id" column="tun_id" />
+		<result property="link_status" column="link_status" />
+	</resultMap>
+
+	<select id="getAll" resultClass="Vnet_link">
+		select * from vnet_link
+	</select>
+	
+	<select id="getAllbyStatus" resultClass="Vnet_link" parameterClass="Integer">
+		select sdn.vnet_link.* from
+		(select sdn.vnet_vnet_resource.* from
+		(select * from sdn.vnet_executor_vnet
+		where sdn.vnet_executor_vnet.executor_id=#exe_id#) as A inner join sdn.vnet_vnet_resource
+		on A.vnet_id=sdn.vnet_vnet_resource.vnet_id and sdn.vnet_vnet_resource.resource_status='wait'
+		and sdn.vnet_vnet_resource.resource_type='link') as B inner join sdn.vnet_link
+		on B.resource_id=sdn.vnet_link.link_id
+		and sdn.vnet_link.link_status='ACTIVE'
+	</select>
+	
+	<select id="getById" resultClass="Vnet_link" parameterClass="String" >
+		select * from vnet_link where link_id=#link_id#
+	</select>
+	
+	<insert id="insertLink" parameterClass="Vnet_link">
+		insert into
+		vnet_link(link_id,link_bandwidth,link_src_id,link_src_type,link_dst_id,link_dst_type,link_ofport_src,link_ofport_dst,link_iscross,link_tunofport_src,link_tunofport_dst,tun_id,link_status)
+		values(#link_id#,#link_bandwidth#,#link_src_id#,#link_src_type#,#link_dst_id#,#link_dst_type#,#link_ofport_src#,#link_ofport_dst#,#link_iscross#,#link_tunofport_src#,#link_tunofport_dst#,#tun_id#,#link_status#)
+	</insert>
+	
+	<update id="updateLink" parameterClass="Vnet_link" >
+		update vnet_link
+		set link_status=#link_status#,
+		tun_id=#tun_id#,
+		link_tunofport_src=#link_tunofport_src#,
+		link_tunofport_dst=#link_tunofport_dst#,
+		link_iscross=#link_iscross#
+		where link_id=#link_id#
+	</update>
+	
+	<delete id="delById" parameterClass="String">
+		delete from vnet_link where link_id=#link_id#	
+	</delete>
+	
+</sqlMap>

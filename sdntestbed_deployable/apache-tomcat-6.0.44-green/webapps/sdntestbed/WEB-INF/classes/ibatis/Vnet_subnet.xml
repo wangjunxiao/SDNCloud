@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Vnet_subnet">
+
+	<typeAlias alias="Vnet_subnet" type="cn.dlut.entity.Vnet_subnet" />
+
+	<resultMap class="Vnet_subnet" id="Vnet_subnet">
+		<result property="usersubnet_id" column="usersubnet_id" />
+        <result property="usersubnet_name" column="usersubnet_name" />
+        <result property="usersubnet_type" column="usersubnet_type" />
+        <result property="usersubnet_addr" column="usersubnet_addr" />
+        <result property="usersubnet_mask" column="usersubnet_mask" />
+	</resultMap>
+
+	<select id="getAll" resultClass="Vnet_subnet">
+		select * from vnet_usersubnet
+	</select>
+	
+	<select id="getById" resultClass="Vnet_subnet" parameterClass="String" >
+		select * 
+		from vnet_usersubnet 
+		where usersubnet_id=#usersubnet_id#
+	</select>
+	
+	<insert id="insertUsersubnet" parameterClass="Vnet_subnet">
+		insert into
+		vnet_usersubnet(
+		usersubnet_id,usersubnet_name,usersubnet_addr,usersubnet_type,usersubnet_mask)
+		values(#usersubnet_id#,#usersubnet_name#,#usersubnet_addr#,#usersubnet_type#,#usersubnet_mask#)
+	</insert>
+	
+	<delete id="delById" parameterClass="String">
+		delete 
+		from vnet_usersubnet
+		where usersubnet_id=#usersubnet_id#	
+	</delete>
+	
+	<update id="updateSubnet" parameterClass="Vnet_subnet">
+		update 
+		vnet_usersubnet
+		set usersubnet_name=#usersubnet_name#,
+			usersubnet_addr=#usersubnet_addr#,
+			usersubnet_type=#usersubnet_type#,
+			usersubnet_mask=#usersubnet_mask#
+		where usersubnet_id=#usersubnet_id#
+	</update>
+	
+</sqlMap>

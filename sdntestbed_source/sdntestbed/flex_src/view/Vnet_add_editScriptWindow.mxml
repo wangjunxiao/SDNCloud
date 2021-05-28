@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark"    
+			   xmlns:mx="library://ns.adobe.com/flex/mx" width="344" height="298"
+			   close="PopUpManager.removePopUp(this)" backgroundColor="#F2EBEB" 
+			   dropShadowVisible="true" borderVisible="true" borderColor="#CEBCBC"
+			   initialize="init()">
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.binding.utils.BindingUtils;
+			import mx.collections.ArrayCollection;
+			import mx.collections.XMLListCollection;
+			import mx.controls.Alert;
+			import mx.core.FlexGlobals;
+			import mx.core.mx_internal;
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			import mx.rpc.events.ResultEvent;
+			
+			import vo.Vnet_userscript;
+			import vo.Vnet_vnet_userscript;
+			
+			private var file:FileReference = new FileReference();
+			private var fileData:String = null;
+			private var is_select:Boolean = false;
+			private var is_upload:Boolean = false;
+			
+			private function init():void{  
+			}  
+			
+			private function select_clickHandler(event:MouseEvent):void{
+				is_select = true;
+				var filter:FileFilter=new FileFilter("Prompt file type*.json", "*.json");
+				file.addEventListener(Event.SELECT,selectedFile);
+				file.browse([filter]);
+			}
+			
+			protected function selectedFile(e:Event):void{
+				if(e.target.size > 524288){
+					Alert.show("The file you want to read is greater than 512KB, please reselect the file");
+					return;
+				}
+				_content.text = e.target.name;
+				file.load();
+				file.addEventListener(Event.COMPLETE,getData);
+			}
+			
+			protected function getData(e:Event):void{
+				var dataArr:ByteArray = file.data;
+				dataArr.position = 0;
+				fileData = dataArr.readUTFBytes(dataArr.length);
+			}
+			
+			private function upload_clickHandler(event:MouseEvent):void{
+				if(is_select){
+					is_select = false;
+					if(verifyScript()){
+						is_upload = true;
+						Alert.show("File upload success!");
+					}
+					else{
+						Alert.show("The document is not legal!");
+					}
+					
+				}
+				else{
+					Alert.show("Unselected file!");
+				}
+			}
+			
+			
+			private function verifyScript():Boolean{
+				var result:Boolean = false;
+				
+				result = true;
+				return result;
+			}
+			
+			protected function button_clickHandler(event:MouseEvent):void{
+				if(is_upload){
+					if(FlexGlobals.topLevelApplication.is_edit == true){
+						FlexGlobals.topLevelApplication.vnet_scripts.getItemAt(FlexGlobals.topLevelApplication.current_index).userscript_name = _name.text;
+						FlexGlobals.topLevelApplication.vnet_scripts.getItemAt(FlexGlobals.topLevelApplication.current_index).userscript_type = _type.text;
+						FlexGlobals.topLevelApplication.vnet_scripts.getItemAt(FlexGlobals.topLevelApplication.current_index).userscript_content = _content.text;
+						Alert.show("Edit operation is completed!","Success");
+					}
+					else{
+						var id:String = "userscript~" + FlexGlobals.topLevelApplication.vnet_counter_script 
+							+"~"+ (new Date).getTime() + "~" + FlexGlobals.topLevelApplication.executor_name;
+						FlexGlobals.topLevelApplication.vnet_counter_script++;
+//						var script:Vnet_userscript = new Vnet_userscript(id, _name.text, _type.text, _content.text);
+//						FlexGlobals.topLevelApplication.vnet_scripts.addItem(script);
+						var vnet_script:Vnet_vnet_userscript = new Vnet_vnet_userscript(FlexGlobals.topLevelApplication.vnet_vnet.vnet_id, id);
+						FlexGlobals.topLevelApplication.vnet_vnet_scripts.addItem(vnet_script);
+						Alert.show("Add operation is completed!","Success");
+					}
+					is_upload = false;
+					PopUpManager.removePopUp(this);
+				}
+				else{
+					Alert.show("The selected file is not uploaded!");
+				}
+			}
+			
+			private function add_edit_lable():String{
+				var result:String = "";
+				if(FlexGlobals.topLevelApplication.is_edit == true){
+					result = "Edit Script";
+				}
+				else{
+					result = "Add Script";
+				}
+				return result;
+			}
+			
+			private function showName():String{
+				var result:String = "";
+				if(FlexGlobals.topLevelApplication.is_edit == true){
+					result = FlexGlobals.topLevelApplication.vnet_scripts.getItemAt(FlexGlobals.topLevelApplication.current_index).userscript_name;
+				}
+				return result;
+			}
+			
+			private function showType():String{
+				var result:String = "";
+				if(FlexGlobals.topLevelApplication.is_edit == true){
+					result = FlexGlobals.topLevelApplication.vnet_scripts.getItemAt(FlexGlobals.topLevelApplication.current_index).userscript_type;
+				}
+				return result;
+			}
+			
+			private function showContent():String{
+				var result:String = "";
+				if(FlexGlobals.topLevelApplication.is_edit == true){
+					result = FlexGlobals.topLevelApplication.vnet_scripts.getItemAt(FlexGlobals.topLevelApplication.current_index).userscript_content;
+				}
+				return result;
+			}
+			
+		]]>
+	</fx:Script>
+	
+	
+	<s:Button x="10" y="10" label="{add_edit_lable()}" height="22" width="324"/>
+	<s:VGroup x="13" y="44" width="113" height="60" gap="27" horizontalAlign="right" paddingTop="10">
+		<s:Label text="script_name" height="15"/>
+		<s:Label text="script_type" height="15"/>
+		<s:Label text="script_content" height="15"/>
+	</s:VGroup>
+	<s:VGroup x="166" y="39" width="166" height="190" gap="20" horizontalAlign="left" paddingTop="10">
+		<s:TextInput text="{showName()}" id="_name"/>
+		<s:TextInput text="{showType()}" id="_type"/>
+		<s:TextInput text="{showContent()}" id="_content" editable="false"/>
+	</s:VGroup>
+	<s:Button x="166" y="163" label="select" id="select" width="60" click="select_clickHandler(event)"/>
+	<s:Button x="234" y="163" label="upload" id="upload" width="60" click="upload_clickHandler(event)"/>
+	<s:Button x="121" y="213" label="Apply" width="100" click="button_clickHandler(event)"/>
+</s:TitleWindow>

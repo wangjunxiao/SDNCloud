@@ -1,0 +1,914 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:item="Components.*"
+			   xmlns:vnet="utils.*"
+			   usePreloader="false"
+			   initialize="init()"
+			   creationComplete="application_creationCompleteHandler()">
+	
+	<fx:Declarations>
+		<mx:RemoteObject id="Vnet_FlexToJavaService" destination="Vnet_FlexToJavaService" >
+			<mx:method name="FlexToJava" fault="faultHandler(event)" result="FlexToJava_resultHandler(event)"/>
+		</mx:RemoteObject>
+	</fx:Declarations>
+	
+	<fx:Declarations>
+		<mx:RemoteObject id="Vnet_JavaToFlexService" destination="Vnet_JavaToFlexService" >
+			<mx:method name="instanceJavaToFlex" fault="faultHandler(event)" result="instanceJavaToFlex_resultHandler(event)"/>
+			<mx:method name="hostJavaToFlex" fault="faultHandler(event)" result="hostJavaToFlex_resultHandler(event)"/>
+			<mx:method name="controllerJavaToFlex" fault="faultHandler(event)" result="controllerJavaToFlex_resultHandler(event)"/>
+			<mx:method name="switchJavaToFlex" fault="faultHandler(event)" result="switchJavaToFlex_resultHandler(event)"/>
+			<mx:method name="oflinkJavaToFlex" fault="faultHandler(event)" result="oflinkJavaToFlex_resultHandler(event)"/>
+			<mx:method name="linkJavaToFlex" fault="faultHandler(event)" result="linkJavaToFlex_resultHandler(event)"/>
+			<mx:method name="e_vJavaToFlex" fault="faultHandler(event)" result="e_vJavaToFlex_resultHandler(event)"/>
+			<mx:method name="ofportJavaToFlex" fault="faultHandler(event)" result="ofportJavaToFlex_resultHandler(event)"/>
+			<mx:method name="switch_ofportJavaToFlex" fault="faultHandler(event)" result="switch_ofportJavaToFlex_resultHandler(event)"/>
+			<mx:method name="imageJavaToFlex" fault="faultHandler(event)" result="imageJavaToFlex_resultHandler(event)"/>
+			<mx:method name="flavorJavaToFlex" fault="faultHandler(event)" result="flavorJavaToFlex_resultHandler(event)"/>
+			<mx:method name="image_instanceJavaToFlex" fault="faultHandler(event)" result="image_instanceJavaToFlex_resultHandler(event)"/>
+			<mx:method name="flavor_instanceJavaToFlex" fault="faultHandler(event)" result="flavor_instanceJavaToFlex_resultHandler(event)"/>
+			<mx:method name="instance_hostJavaToFlex" fault="faultHandler(event)" result="instance_hostJavaToFlex_resultHandler(event)"/>
+			<mx:method name="instance_controller" fault="faultHandler(event)" result="instance_controllerJavaToFlex_resultHandler(event)"/>
+			<mx:method name="userscript_JavaToFlex" result="userscript_JavaToFlexResultHandler(event)" fault = "faultHandler(event)"/>
+			<mx:method name="instanceIP_JavaToFlex" result="instanceIP_JavaToFlexResultHandler(event)" fault = "faultHandler(event)"/>
+			<mx:method name="queryVnet" result="queryVnetResultHandler(event)" fault = "faultHandler(event)"/>
+		</mx:RemoteObject>
+	</fx:Declarations>
+	
+	<fx:Declarations>
+		<mx:RemoteObject id="Vnet_OpsNovaService" destination="Vnet_OpsNovaService" >
+			<mx:method name="getVncUrl" fault="getVncUrl_faultHandler(event)" result="getVncUrl_resultHandler(event)"/>
+		</mx:RemoteObject>
+	</fx:Declarations>
+	
+	<fx:Script source="../dataprovider/define.as"/>	
+	<fx:Script source="../utils/loading.as"/>	
+	<fx:Script source="../utils/CryptoUtil.as"/>
+	<fx:Script source="../dataprovider/Listshow.as"/>
+	<fx:Script source="../dataprovider/xmldata.as"/>	
+	<fx:Script source="../dataprovider/getdata.as"/>
+	<fx:Script source="../dataprovider/vnet_output.as"/>
+	<fx:Script source="../dataprovider/vnet_showtopo.as"/>
+	<fx:Script source="../dataprovider/vnet_update.as"/>
+	<fx:Script source="../dataprovider/draw_Fattree.as"/>
+	<fx:Script source="../dataprovider/parseprocessing.as"/>
+	
+	<fx:Script>
+		<![CDATA[	
+			import flash.net.navigateToURL;
+			
+			import mx.controls.ProgressBar;
+			import mx.controls.Text;
+			import mx.events.CloseEvent;
+			
+			import spark.components.Label;
+			
+			import utils.HashMap;
+			
+			import view.Vnet_hostConsoleWindow;
+			import view.Vnet_hostPropertiesWindow;
+			
+			import vo.Map;
+			
+			public function showConsole():void{
+				vnc_iscomplete = false;
+				var item_id:String;
+				var ins_id:String = "";
+				if(activeItem.className == "Controller"){
+					item_id = Controller(activeItem).getCon_id();
+					for(var i:int=0; i<vnet_instance_controller.length; i++){
+						if(vnet_instance_controller[i].controller_id == item_id){
+							ins_id = vnet_instance_controller[i].instance_id;
+							break;
+						}
+					}
+				}
+				else{
+					item_id = Host(activeItem).getHost_ID();
+					for(var j:int=0; j<vnet_instance_host.length; j++){
+						if(vnet_instance_host[j].host_id == item_id){
+							ins_id = vnet_instance_host[j].instance_id;
+							break;
+						}
+					}
+				}
+				if(ins_id == ""){
+					Alert.show("The console is temporarily unavailable");
+				}
+				else{
+					Vnet_OpsNovaService.getVncUrl(ins_id);
+					timer=new Timer(4000, 1);
+					timer.addEventListener(TimerEvent.TIMER, VNConTime);
+					loading("images/loading.gif");
+					timer.start();
+				}
+			}
+			
+			protected function VNConTime(event:TimerEvent):void{
+				if(timer.currentCount==1){
+					if(!vnc_iscomplete){
+						PopUpManager.removePopUp(img);
+						Alert.show("The console is temporarily unavailable");
+					}
+				}
+			}
+			
+			protected function getVncUrl_resultHandler(event:ResultEvent):void{
+				vnc_url = event.result as String;
+				PopUpManager.removePopUp(img);
+				if(vnc_url == ""){
+					Alert.show("The console is temporarily unavailable");
+				}
+				else{
+					vnc_iscomplete = true;
+					var mywindow:Vnet_hostConsoleWindow = Vnet_hostConsoleWindow(PopUpManager.createPopUp(this, Vnet_hostConsoleWindow, false));
+				}
+			}
+			
+			private function getVncUrl_faultHandler(event:FaultEvent):void{        
+//				Alert.show("Fault:"+event.fault.toString());
+			}
+			
+			private function faultHandler(event:FaultEvent):void{        
+				Alert.show("Fault:"+event.fault.toString());
+			}
+			
+			private function application_creationCompleteHandler():void
+			{
+				parentDisplayObject=this;
+			}
+			
+			/** Complete the setting of the component
+			 * parameter obj :Components to be set up
+			 * parameter x_value : The location of the component in the X axis
+			 * parameter y_value : The location of the component in the Y axis
+			 * parameter str1 : The label of the component (the string below the component)
+			 * return ： null
+			 * */
+			private function config(obj:Item_image,x_value:Number,y_value:Number,str1:String):void{		
+				obj.setXY(x_value,y_value);
+				obj.settitle(str1);
+			}
+			
+			/**
+			 * transformation from the mouse to the pen
+			 * parameter ： null
+			 * return ：null
+			 *  */			
+			private function cursorChange():void
+			{
+				CursorManager.setCursor(imageCursor,CursorManagerPriority.HIGH,-7,-27);
+			}
+			
+			/**Menu options are selected
+			 * parameter event ： select event
+			 * return ：null*/			
+			private function menubar_itemClickHandler(event:MenuEvent):void
+			{				
+				//				if(event.item.@label=="Export the topology in Topo");
+				
+				//				if(event.item.@label=="Export the topology in CreateTopo");
+				
+				if(event.item.@label=="Controller")
+					listshowHandler(1);
+				
+				if(event.item.@label=="Switch")
+					listshowHandler(2);
+				
+				if(event.item.@label=="Port")
+					listshowHandler(3);
+				
+				if(event.item.@label=="Link")
+					listshowHandler(4);
+				
+				if(event.item.@label=="Flow Table")
+					listshowHandler(5);
+				
+				if(event.item.@label=="Host")
+					listshowHandler(6);
+				if(event.item.@label=="Add Controller")
+					listshowHandler(7);
+				if(event.item.@label=="Delete Controller")
+					listshowHandler(8);
+				if(event.item.@label=="Show Instances")
+					listshowHandler(9);
+				if(event.item.@label=="Show Images")
+					listshowHandler(10);
+				if(event.item.@label=="Show Flavors")
+					listshowHandler(11);
+				if(event.item.@label=="Subnet Management")
+					if(vnet_vnet == null){
+						Alert.show("Vnet is Not submitted yet!");	
+					}
+					else{
+						listshowHandler(12);
+					}
+				if(event.item.@label=="Script Management")
+					if(vnet_vnet == null){
+						Alert.show("Vnet is Not submitted yet!");	
+					}
+					else{
+						listshowHandler(13);
+					}
+				if(event.item.@label=="Guide Book")
+					listshowHandler(14);
+			}
+			
+			private function buttonContainer_creationCompleteHandler(event:FlexEvent):void 
+			{
+				delbtn.addEventListener(MouseEvent.CLICK,delbtnHandler);
+			}
+			
+			private function delbtnHandler(event:MouseEvent):void
+			{
+				if(selectedObj!=null){
+					selectedObj.Delete();
+					selectedObj=null;
+				}		
+			}
+			
+			private function tree_creationCompleteHandler(event:FlexEvent):void 
+			{ 
+				//validateNow();   redraw
+				objectTree.expandItem(library.getItemAt(0), true); 
+				objectTree.expandItem(library.getItemAt(1), true); 
+				objectTree.addEventListener(DragEvent.DRAG_START,treeDragStartHandler);
+				objectTree.addEventListener(MouseEvent.CLICK,ClickHandler);
+			} 
+			
+			private function ClickHandler(event:MouseEvent):void
+			{
+				previewURL= event.currentTarget.selectedItem.@preview_url;
+				/*	
+				source's url is relative path instead of absolute path
+				embed is relative path
+				*/
+				previewImage.source=previewURL;
+				if(previewURL=="images/ethernet.jpg"){
+					isDraw=true;
+					isMouseDown=false;
+					cursorChange();
+				}
+				else if(previewURL=="images/fattree.jpg"){
+//					isMouseDown=false;
+//					myLoader  = new URLLoader(FatTreeXMLURL);
+//					isBCubeSel = 0;
+//					isFatTreeSel = 1;
+//					detect();									
+//					if(isXMLLoaded==1){							
+//						draw_Fattree();							
+//					}
+				}
+				else{
+					isDraw=false;
+					isMouseDown=false;
+					CursorManager.removeAllCursors();
+				}
+			}
+			
+			
+			private function treeDragStartHandler(event:MouseEvent):void
+			{
+				drag_start_obj=event.currentTarget.selectedItem.@preview_url;
+			}
+			
+			
+			private function networkPanel_creationCompleteHandler():void 
+			{ 
+				//event:FlexEvent;	
+				network_group.removeAllElements();
+				network.addEventListener(MouseEvent.MOUSE_UP, netwokrPanel_MouseUpHandler);
+				network.addEventListener(MouseEvent.MOUSE_MOVE, netwokrPanel_MouseMoveHandler);
+				
+				//show topo
+				if(executor_name != null){
+					vnet_show_topoHandler();
+					link_num = vnet_oflinks.length + vnet_links.length;
+				}
+				
+				//show login info
+				var info:Label = new Label();
+				info.top = 4.2;
+				info.right = 56;
+				info.text = showUserName();
+				addElement(info);
+				var logout:Label = new Label();
+				logout.top = 4.2;
+				logout.right = 6;
+				logout.text = "[Logout]";
+				logout.addEventListener(MouseEvent.CLICK, handle_clictLogout);
+				addElement(logout);
+								
+			}
+			
+			private function handle_clictLogout(event:MouseEvent):void{
+				if(executor != null){
+					Alert.yesLabel = "yes"; 
+					Alert.cancelLabel = "cancel";
+					Alert.show("Exit  Logout?",executor_name,1|8,this,userLogout);
+				}
+			}
+			
+			private function userLogout(event:CloseEvent):void{ 
+				if(event.detail==Alert.YES){ 
+					delete_All();
+					vnet_vnet = null;
+					ExternalInterface.call("function() {window.location.href=" + "'./Vnet_Login.html#" + "';}");
+				} 
+			} 
+			
+			private function netwokrPanel_MouseUpHandler(event:MouseEvent):void
+			{
+				if(isMouseDown){
+					//mouse up, modify id by component's newest location
+					var relativeX:Number = event.stageX - 283;
+					var relativeY:Number = event.stageY - 107;
+					var tmp:Array;
+					var past_id:String;
+					var pre_id:String;
+					if(currentTarget.className == 'Controller'){
+						//isnew: If the component has been generated in the background, id can not be modified
+						var c_isnew:Boolean = true;
+						past_id = Controller(currentTarget).getCon_id();
+						for(var vc:int=0; vc<vnet_controllers.length; vc++){
+							if(vnet_controllers[vc].controller_id == past_id){
+								c_isnew = false;
+								break;
+							}
+						}
+						if(c_isnew){
+							tmp = Controller(currentTarget).getCon_id().split("~");
+							pre_id = tmp[0]+"~"+tmp[1]+"~"+tmp[2]+"~"+tmp[3]+"~"+relativeX+"~"+relativeY;
+							currentTarget.setCon_id(pre_id);
+							//If the user updates the topology, since the component is save by vnet_add_controllers, need to modify it 
+							if(vnet_vnet != null){
+								for(var v_ac:int=0; v_ac<vnet_add_cons.length; v_ac++){
+									if(vnet_add_cons[v_ac].controller_id == past_id){
+										vnet_add_cons[v_ac].controller_id = pre_id;
+										break;
+									}
+								}
+							}
+							
+						}
+					}
+					else if(currentTarget.className == 'Switch'){
+						var s_isnew:Boolean = true;
+						past_id = Switch(currentTarget).getSwitch_id();
+						for(var vs:int=0; vs<vnet_switches.length; vs++){
+							if(vnet_switches[vs].switch_id == past_id){
+								s_isnew = false;
+								break;
+							}
+						}
+						if(s_isnew){
+							tmp = Switch(currentTarget).getSwitch_id().split("~");
+							pre_id = tmp[0]+"~"+tmp[1]+"~"+tmp[2]+"~"+tmp[3]+"~"+relativeX+"~"+relativeY;
+							currentTarget.setSwitch_id(pre_id);
+							//If the user updates the topology, since the component is save by vnet_add_controllers, need to modify it 
+							if(vnet_vnet != null){
+								for(var v_as:int=0; v_as<vnet_add_swis.length; v_as++){
+									if(vnet_add_swis[v_as].switch_id == past_id){
+										vnet_add_swis[v_as].switch_id = pre_id;
+										break;
+									}
+								}
+							}
+						}
+					}
+					else if(currentTarget.className == 'Host'){
+						var h_isnew:Boolean = true;
+						past_id = Host(currentTarget).getHost_ID();
+						for(var vh:int=0; vh<vnet_hosts.length; vh++){
+							if(vnet_hosts[vh].host_id == past_id){
+								h_isnew = false;
+								break;
+							}
+						}
+						if(h_isnew){
+							tmp = Host(currentTarget).getHost_ID().split("~");
+							pre_id = tmp[0]+"~"+tmp[1]+"~"+tmp[2]+"~"+tmp[3]+"~"+relativeX+"~"+relativeY;
+							currentTarget.setHost_ID(pre_id);
+							//If the user updates the topology, since the component is save by vnet_add_controllers, need to modify it 
+							if(vnet_vnet != null){
+								for(var v_ah:int=0; v_ah<vnet_add_hosts.length; v_ah++){
+									if(vnet_add_hosts[v_ah].host_id == past_id){
+										vnet_add_hosts[v_ah].host_id = pre_id;
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+				isMouseDown = false;
+			}
+			
+			//The case of dragging the component, redraw the connected line
+			private function netwokrPanel_MouseMoveHandler(event:MouseEvent):void
+			{
+				if(isMouseDown) 
+				{	
+					//get location
+					var tempx:Number = currentTarget.x + event.stageX - currentX;
+					var tempy:Number = currentTarget.y + event.stageY - currentY;
+					currentX = event.stageX;
+					currentY = event.stageY;
+					//move
+					currentTarget.move(tempx, tempy); 
+					//Redraw line after dragging components
+					var parentLinks:ArrayCollection = currentTarget.getParentLink();
+					for(var j:int=0; j <parentLinks.length; j++) {
+						var parentlink:Link = parentLinks.getItemAt(j) as Link;
+						//parentlink.reset();
+						parentlink.redraw();						
+					}	
+					//Redraw line after dragging components
+					var childrenLinks:ArrayCollection = currentTarget.getChildrenLinks();
+					for(var i:int=0; i < childrenLinks.length; i++) {
+						var childLink:Link = childrenLinks.getItemAt(i) as Link;
+						//childLink.reset();
+						childLink.redraw();	
+					}
+				}
+			}
+			
+			private function networkPanel_dragEnterHandler(event:DragEvent):void 
+			{
+				var dropTarget:Panel=Panel(event.currentTarget);
+				DragManager.acceptDragDrop(dropTarget);            	
+			}
+			
+			
+			//Container receiving picture
+			private function network_dragDropHandler(event:DragEvent):void
+			{	
+				var date:Date = new Date();
+				if(drag_start_obj=="images/controller.jpg"){
+					var item_con:Controller = new Controller();					
+					config(item_con,event.currentTarget.mouseX,
+						event.currentTarget.mouseY,"c" + vnet_counter);
+					item_con.setCounter(vnet_counter);
+					item_con.setTime(date.toString());
+					item_con.setCon_id("c~" + item_con.getCounter().toString() + "~" 
+										+ item_con.getTime() +"~"+ executor_name
+										+ "~" + item_con.x + "~" + item_con.y);
+					item_con.setCon_name("c" + vnet_counter);
+					C_obj.addItem(item_con);
+					vnet_counter++;
+					//update 
+					if(vnet_vnet != null){
+						var con:Vnet_controller = new Vnet_controller();
+						con.controller_id = item_con.getCon_id();
+						con.controller_type = item_con.getCon_type();
+						vnet_add_cons.addItem(con);
+					}
+					item_con.addEventListener(MouseEvent.MOUSE_DOWN, imageMouseDownHandler);
+					item_con.addEventListener(MouseEvent.MOUSE_UP, imageMouseUpHandler);
+					item_con.addEventListener(MouseEvent.MOUSE_OVER, imageMouseOverHandler);  
+					network_group.addElement(item_con);
+				}
+				
+				if(drag_start_obj=="images/switch.jpg"){
+					var item_swi:Switch = new Switch();
+					config(item_swi,event.currentTarget.mouseX,
+						event.currentTarget.mouseY,"s" + vnet_counter);
+					item_swi.setCounter(vnet_counter);
+					item_swi.setTime(date.toString());
+					item_swi.setSwitch_id("s~" + item_swi.getCounter().toString() + "~" 
+										+ item_swi.getTime() +"~"+ executor_name
+										+ "~" + item_swi.x + "~" + item_swi.y);					
+					item_swi.setSwitch_name("s" + vnet_counter);
+					S_obj.addItem(item_swi);
+					vnet_counter++;
+					//update
+					if(vnet_vnet != null){
+						var swi:Vnet_switch = new Vnet_switch();
+						swi.switch_id = item_swi.getSwitch_id();
+						vnet_add_swis.addItem(swi);
+					}
+					item_swi.addEventListener(MouseEvent.MOUSE_DOWN, imageMouseDownHandler);
+					item_swi.addEventListener(MouseEvent.MOUSE_UP, imageMouseUpHandler);
+					item_swi.addEventListener(MouseEvent.MOUSE_OVER, imageMouseOverHandler);  
+					network_group.addElement(item_swi);
+				}
+				
+				if(drag_start_obj=="images/host.jpg"){
+					var item_h:Host= new Host();
+					config(item_h,event.currentTarget.mouseX,
+						event.currentTarget.mouseY,"h" + vnet_counter);
+					item_h.setCounter(vnet_counter);
+					item_h.setTime(date.toString());
+					item_h.setHost_ID("h~" + item_h.getCounter().toString() + "~" 
+									+ item_h.getTime() +"~"+ executor_name
+									+ "~" + item_h.x + "~" + item_h.y);
+					item_h.setHost_Name("h" + vnet_counter);
+					H_obj.addItem(item_h);
+					vnet_counter++;
+					//update
+					if(vnet_vnet != null){
+						var host:Vnet_host = new Vnet_host();
+						host.host_id = item_h.getHost_ID();
+						vnet_add_hosts.addItem(host);
+					}
+					item_h.addEventListener(MouseEvent.MOUSE_DOWN, imageMouseDownHandler);
+					item_h.addEventListener(MouseEvent.MOUSE_UP, imageMouseUpHandler);
+					item_h.addEventListener(MouseEvent.MOUSE_OVER, imageMouseOverHandler);  
+					network_group.addElement(item_h);
+				}
+				
+				if(drag_start_obj=="images/ethernet.jpg"){
+					isDraw=true;
+					isMouseDown=false;
+					cursorChange();
+				}
+			}
+			
+			
+			private function imageMouseDownHandler(event:MouseEvent):void
+			{	
+				if(isDraw) {
+					fromObj = Item_image(event.currentTarget);
+				} 
+				else {
+					currentTarget = Item_image(event.currentTarget);
+					isMouseDown = true;
+					currentX = event.stageX;
+					currentY = event.stageY;
+				}
+			}
+			
+			private function imageMouseOverHandler(event:MouseEvent):void
+			{
+				if(isDraw) {
+					Item_image(event.currentTarget).setFocus();            		
+				}
+			}
+			
+			private function imageMouseUpHandler(event:MouseEvent):void
+			{
+				if(isDraw) {
+					toObj = Item_image(event.currentTarget);
+					if(fromObj.className == "Controller" && toObj.className == "Controller"){
+						if(fromObj != toObj){
+							Alert.show("Draw between Controller and Controller is illegal! ");
+						}
+					}
+					else if(fromObj.className == "Controller" && toObj.className == "Host") {
+						Alert.show("Draw between Controller and Host is illegal! ");
+					}
+					else if(fromObj.className == "Host" && toObj.className == "Controller"){
+						Alert.show("Draw between Host and Controller is illegal! ");
+					}
+					else{
+						//Prevent duplicate drawing
+						var can_draw:Boolean = true;
+						for(var child_i:int=0; child_i<fromObj.getChildrenLinks().length; child_i++){
+							if(fromObj.getChildrenLinks()[child_i].toObj == toObj){
+								can_draw = false;
+								break;
+							}
+						}
+						for(var parent_i:int=0; parent_i<fromObj.getParentLink().length; parent_i++){
+							if(fromObj.getParentLink()[parent_i].fromObj == toObj){
+								can_draw = false;
+								break;
+							}
+						}
+						if(!can_draw){
+							Alert.show("Do not repeat draw line: ("+fromObj.title+","+toObj.title+")");
+							fromObj = null;
+							toObj = null;
+						}
+						else{
+							var obj:ArrayCollection = new ArrayCollection();
+							obj.addItem(fromObj);
+							obj.addItem(toObj);
+							var link:Link = new Link(obj);
+							
+							var childrenLinks:ArrayCollection = fromObj.getChildrenLinks();
+							childrenLinks.addItem(link);					
+							var parentLink:ArrayCollection = toObj.getParentLink();
+							parentLink.addItem(link); 
+							
+							var adjLinks_from:ArrayCollection = fromObj.getadjLinks();
+							adjLinks_from.addItem(link);
+							var adjLinks_to:ArrayCollection = toObj.getadjLinks();
+							adjLinks_to.addItem(link);
+							
+							//update link
+							if(vnet_vnet != null){
+								var updateobj:ArrayCollection = new ArrayCollection();
+								updateobj.addItem(fromObj);
+								updateobj.addItem(toObj);
+								updateobj.addItem("add");
+								var updatelink:Link = new Link(updateobj);
+								updatelink.link_id = link.link_id;
+								vnet_updatelinks.addItem(updatelink);
+							}
+							
+							var uiObj:UIComponent = new UIComponent(); 
+							uiObj.addChild(link);
+							network_group.addElement(uiObj);
+							//Can't draw line continuously, but it can be dragged after.
+							isDraw=false;
+							CursorManager.removeAllCursors();
+							fromObj = null;
+							toObj = null;
+						}
+					}
+				}
+			} 	
+			
+			protected function vnet_submit_clickHandler(event:MouseEvent):void  
+			{  
+				if(executor_name != null){
+					if(vnet_vnet != null){
+						vnet_update_clickHandler(event);
+					}
+					else{
+						if(C_obj.length>0 || S_obj.length>0 || H_obj.length>0){
+							vnet_submit_topoHandler(event,C_obj,S_obj,H_obj);
+						}
+						else{
+							Alert.show("Do not submit empty topology!");
+						}
+					}
+				}
+				else{
+					Alert.show("Not logged in and cannot be submitted! ");
+				}
+			}  
+			
+			protected function vnet_delete_clickHandler(event:MouseEvent):void{
+				Alert.yesLabel = "yes"; 
+				Alert.cancelLabel = "cancel";
+				Alert.show("Do you confirm to clear?","Vnet_Lab",1|8,this,delete_vnet);
+			}
+			
+			public function delete_All():void{
+				network_group.removeAllElements();
+				vnet_ofports.removeAll();
+				vnet_switch_ofports.removeAll();
+				vnet_instances.removeAll();
+				vnet_instance_controller.removeAll();
+				vnet_instance_host.removeAll();
+				vnet_image_instance.removeAll();
+				vnet_flavor_instance.removeAll();
+				vnet_resources.removeAll();
+				vnet_requests.removeAll();
+				vnet_add_cons.removeAll();
+				vnet_add_hosts.removeAll();
+				vnet_add_swis.removeAll();
+				vnet_del_cons.removeAll();
+				vnet_del_swis.removeAll();
+				vnet_del_hosts.removeAll();
+				vnet_updatelinks.removeAll();
+				vnet_controllers.removeAll();
+				vnet_switches.removeAll();
+				vnet_hosts.removeAll();
+				vnet_oflinks.removeAll();
+				vnet_links.removeAll();
+				C_obj.removeAll();
+				H_obj.removeAll();
+				S_obj.removeAll();
+				link_num = 0;
+				vnet_counter_vnet = 0;
+				vnet_counter = 0;
+				vnet_counter_ofport = 0;
+				vnet_counter_instance = 0;
+			}
+			
+			public function delete_vnet(event:CloseEvent):void{ 
+				if(event.detail==Alert.YES){ 
+					delete_All();
+				} 
+			} 
+			 
+			public function vnet_test_clickHandler(event:MouseEvent):void{
+				if(vnet_vnet == null){
+					delete_All();
+					var loader:URLLoader = new URLLoader();  
+					loader.addEventListener(Event.COMPLETE, xmlLoaded);
+					loader.load(new URLRequest("dataprovider/FTreeTest.xml"));
+				}
+				else{
+					Alert.show("Vnet have been built, test topo is unavailable now");
+				}
+			}
+			
+			public function vnet_proBar(ins_num:int):void{
+				var step:Number = ins_num*13/15;
+				var proBar:ProgressBar = new ProgressBar();  
+				proBar.width = 100;  
+				proBar.x = 500;  
+				proBar.y = 500;  
+				proBar.minimum = 0;  
+				proBar.maximum = 100;  
+				proBar.direction = "right";  
+				proBar.mode = "manual";  
+				
+				PopUpManager.addPopUp(proBar,this,true);
+				PopUpManager.centerPopUp(proBar); 
+				
+				var timer:Timer;  
+				var valueNum:Number = 0;  
+				
+				timer = new Timer(100);    
+				timer.addEventListener(TimerEvent.TIMER, function():void{  
+					//1, 13s
+					//0.1, 130s
+					//0.05, 260s, 4min
+					//0.087, 144s, 10instance
+					valueNum = valueNum + step;  
+					if(valueNum >= 100)  
+					{  
+						proBar.setProgress(valueNum, 100);  
+						proBar.label = "Synchronizing completion";  
+						proBar.visible = false;  
+						return;  
+					}  
+					proBar.setProgress(valueNum, 100);  
+					if(valueNum <= 80){
+						proBar.label = "Create Instance" + valueNum.toFixed(2) + "%";
+					}
+					else{
+						proBar.label = "Create Link" + valueNum.toFixed(2) + "%";
+					}
+					
+				});  
+				timer.start();  
+			}
+			
+			private function verify_mask(mask:String):Boolean{
+				var result:Boolean = false;
+				var temp:Array = mask.split(".");
+				for(var i:int=0; i<temp.length; i++){
+					temp[i] = parseInt(temp[i]).toString(2);
+					var len:int = 8-temp[i].length;
+					for(var k:int=0; k<len; k++){
+						temp[i] = "0"+temp[i];
+					}
+				}
+				var bi:String = temp[0] + temp[1] + temp[2] + temp[3];
+				Alert.show(bi);
+				var start:Boolean = false;
+				var stop:Boolean = false;
+				for(var j:int=0; j<bi.length; j++){
+					if(!start && bi.charAt(j) == "1" && j==0){ //from 1 start = true
+						start = true;
+					}
+					if(start && bi.charAt(j) == "0"){ //meet 0, stop = true
+						stop = true;
+					}
+					if(stop && bi.charAt(j) == "1"){ //1..0...1
+						return false;
+					}
+					if(!start && bi.charAt(j) == "1"){ //0...1
+						return false;
+					}
+					if(start && stop && bi.charAt(j) == "1"){ //1..0...1
+						return false;
+					}
+					if(j == bi.length-1){
+						if(!start && !stop){ //all 0
+							result = true;
+						}
+						else if(start && !stop){ //all 1
+							result = true;
+						}
+						else if(start && stop){ //1...0....
+							result = true;
+						}
+					}
+				}
+				return result;
+			}
+			
+			public function showUserName():String{
+				var name:String = "";
+				if(executor == null){
+					name = "[GUEST]";
+				}
+				else{
+					name = "[" + executor.executor_name + "]";
+				}
+				return name;
+			}
+			
+			public function vnet_clickHandler(event:MouseEvent):void{
+//				Alert.show("" + vnet_updatelinks.length);
+//				Alert.show(""+vnet_counter);
+//				Alert.show(""+Controller(C_obj[0]).getCon_id());
+//				config(C_obj[0], 40, 80, "dd");
+//				Alert.show("image:"+H_obj[0].getimage() + "##flavor:"+H_obj[0].getflavor());
+//				Alert.show("add_h:"+vnet_add_hosts.length);
+//				Alert.show("add_h_id:"+vnet_add_hosts[0].host_id);
+//				Alert.show("del_h:"+vnet_del_hosts.length);
+//				Alert.show("H_obj_id:"+H_obj[6].getHost_ID());
+//				var v:Vnet_vnet = new Vnet_vnet();
+//				v.vnet_id = "xx";
+//				var v2:Vnet_vnet = v;
+//				v = null;
+//				Alert.show(vnc_url);
+				Alert.show(H_obj[0].host_config);
+				Alert.show(H_obj[0].flavor);
+				Alert.show(H_obj[0].image);
+//				if(vnet_vnet == null){
+//					Alert.show("null");
+//				}
+//				else{
+//					Alert.show(vnet_vnet.vnet_id);
+//				}
+			}
+			
+		]]>
+	</fx:Script>  
+	
+	<s:layout>
+		<s:ConstraintLayout>
+			<s:constraintRows>
+				<s:ConstraintRow id="row1" height="50"/>
+				<s:ConstraintRow id="row2" height="65%"/>
+				<s:ConstraintRow id="row3" height="35%"/>
+			</s:constraintRows>
+			
+			<s:constraintColumns>
+				<s:ConstraintColumn id="col1" width="255"/>
+				<s:ConstraintColumn id="col2" width="100%"/>
+			</s:constraintColumns>
+		</s:ConstraintLayout>	
+	</s:layout>
+	
+	<mx:MenuBar id="mymenu" labelField="@label" dataProvider="{menuBarCollection}" 
+				top="0" left="0" right="0" itemClick="menubar_itemClickHandler(event)"
+				chromeColor="0x014D67" fontWeight="bold"  showRoot="true"
+				/>
+	
+	<s:SkinnableContainer skinClass="skins.CoolSkin" left="0" top="20" right="0"
+						  creationComplete="buttonContainer_creationCompleteHandler(event)">
+		<s:layout>
+			<s:HorizontalLayout gap="0"/>
+		</s:layout>
+		<s:Button id="newbtn" icon="@Embed('assets/new.jpg')" width="40" height="29" toolTip="New"/>
+		<s:Button id="opebtn" icon="@Embed('assets/open.jpg')" width="40" height="29" toolTip="Open"/>
+		<s:Button id="savbtn" icon="@Embed('assets/save.jpg')" width="40" height="29" toolTip="Save"/>
+		<s:Button id="pribtn" icon="@Embed('assets/print.jpg')" width="40" height="29" toolTip="Print"/>
+		<s:Button id="undbtn" icon="@Embed('assets/undo.jpg')" width="40" height="29" toolTip="Undo"/>
+		<s:Button id="redbtn" icon="@Embed('assets/redo.jpg')" width="40" height="29" toolTip="Redo"/>
+		<s:Button id="zoomin" icon="@Embed('assets/zoomin.jpg')" width="40" height="29" toolTip="Zoom in"/>
+		<s:Button id="zoomout" icon="@Embed('assets/zoomout.jpg')" width="40" height="29" toolTip="Zoom out"/>
+		<s:Button id="delbtn" icon="@Embed('assets/delete.jpg')" width="40" height="29" toolTip="Delete"/>
+	</s:SkinnableContainer>
+	
+	<s:Panel title="Library" top="row2:0" left="2"  bottom="row2:2" 
+			 dropShadowVisible="false" width="250">
+		<s:layout>
+			<s:VerticalLayout clipAndEnableScrolling="true"/>
+		</s:layout>
+		<mx:Tree id="objectTree" dataProvider="{library}" labelField="@label" 
+				 width="100%" height="100%"
+				 dragEnabled="true" dragMoveEnabled="false" showRoot="true"
+				 creationComplete="tree_creationCompleteHandler(event)"/>
+	</s:Panel>
+	
+	<s:Panel id="preview" title="Preview" left="2" top="row3:0" bottom="row3:3"
+			 dropShadowVisible="false" width="250">
+		<s:layout>
+			<s:VerticalLayout clipAndEnableScrolling="true"/>
+		</s:layout>
+		<s:Scroller width="100%" height="100%">
+			<s:Group width="100%" height="100%">
+				<s:layout>
+					<s:BasicLayout/>
+				</s:layout>
+				<mx:Image id="previewImage" 
+						  horizontalCenter="0" verticalCenter="0"/>
+			</s:Group>
+		</s:Scroller>
+	</s:Panel>
+	
+	<s:Panel id="network" title="Workbench" left="col2:0" top="row2:0"  right="2" bottom="row3:3" height="100%" 
+			 creationPolicy="all"
+			 dropShadowVisible="false" 
+			 dragEnter="networkPanel_dragEnterHandler(event)" 
+			 dragDrop="network_dragDropHandler(event)">
+		<s:layout>
+			<s:BasicLayout clipAndEnableScrolling="true"/>
+		</s:layout>
+		<s:Scroller width="100%" height="100%">
+			<s:Group id="network_group" width="100%" height="100%">
+				<s:layout>
+					<s:BasicLayout/>
+				</s:layout>									
+			</s:Group>
+		</s:Scroller>
+		<s:Button label="submit" left = "6" click="vnet_submit_clickHandler(event);"/>
+		<s:Button label="clear" left = "78" click="vnet_delete_clickHandler(event);"/>
+		<s:Button label="Test" left = "150" click="vnet_test_clickHandler(event);"/>
+		<s:Button label="click" right = "0" click="vnet_clickHandler(event);" visible="false"/>
+	</s:Panel >
+</s:Application>
+

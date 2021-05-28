@@ -1,0 +1,25 @@
+		SDN Testbed Guide Book
+1. Topology:
+	1.1 Create, Update, Delete
+	1.2 After clicking the button of "submit", the location of all components will be fixed
+2. Controller:
+	2.1 The backend only offers the support for Floodlight so far, the type of Ryu will be considered in the future work
+	2.2 The default ip addr of controller is 10.3.0.0/16, a reachable network connection is required for access to its gui page
+3. Switch:
+	3.1 The backend only offers the support for secure mode ovs so far, the type of standalone mode ovs will be considered in the future work
+4. Host:
+	4.1 A customized ip addr will be considered in the future work
+5. Link:
+	5.1 Orange Line: The link between Controller and Swtich
+	5.2 Blue Line: The link between Switch and Host, as well two Switch
+	                    Show OpenFlow port num by clicking on, can be canceled by clicking any other component
+6. User Subnet:
+	6.1 Create, Update, Delete
+7. User Script:
+	7.1 Currently unavailable
+8. Test Button:
+	8.1 Create a simple FatTree topology for the user whose Vnet is empty
+9. Menu Bar:
+	9.1 Currently unavailable except for Management and Help
+10. Icon:
+	10.1 The row of icon below the menu bar is currently unavailable

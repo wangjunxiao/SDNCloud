@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Vnet_instance">
+
+	<typeAlias alias="Vnet_instance" type="cn.dlut.entity.Vnet_instance" />
+
+	<resultMap class="Vnet_instance" id="Vnet_instance">
+		<result property="instance_id" column="instance_id" />
+		<result property="instance_osid" column="instance_osid" />
+		<result property="instance_name" column="instance_name" />
+		<result property="instance_type" column="instance_type" />
+		<result property="instance_zone" column="instance_zone" />
+		<result property="instance_status" column="instance_status" />
+	</resultMap>
+
+	<select id="getAll" resultClass="Vnet_instance">
+		select * from vnet_instance
+	</select>
+	
+	
+	<select id="getByHostId" resultClass="Vnet_instance" parameterClass="String">
+		select vnet_instance.* from 
+		    (select * from
+		    sdn.vnet_instance_host
+		    where vnet_instance_host.host_id=#host_id#) as A
+		inner join sdn.vnet_instance
+		on A.instance_id=vnet_instance.instance_id
+	</select>
+	
+	<select id="getByConId" resultClass="Vnet_instance" parameterClass="String">
+		select vnet_instance.* from 
+		    (select * from
+		    sdn.vnet_instance_controller
+		    where sdn.vnet_instance_controller.controller_id=#con_id#) as A
+		inner join sdn.vnet_instance
+		on A.instance_id=vnet_instance.instance_id
+	</select>
+	
+	<select id="getByStackId" resultClass="Vnet_instance" parameterClass="Integer">
+		select vnet_instance.* from
+		    (select vnet_stack_instance.instance_id from sdn.vnet_stack_instance
+		    where vnet_stack_instance.stack_id=#stack_id#) as A
+		inner join sdn.vnet_instance
+		on A.instance_id=vnet_instance.instance_id
+	</select>
+	
+	<select id="getAllbyStatus" resultClass="Vnet_instance" parameterClass="Integer">
+		(select sdn.vnet_instance.* from
+		(select sdn.vnet_instance_controller.* from
+		(select sdn.vnet_vnet_resource.* from
+		(select * from sdn.vnet_executor_vnet
+		where sdn.vnet_executor_vnet.executor_id=#exe_id#) as A inner join sdn.vnet_vnet_resource
+		on A.vnet_id=sdn.vnet_vnet_resource.vnet_id and sdn.vnet_vnet_resource.resource_status='wait'
+		and sdn.vnet_vnet_resource.resource_type='Controller') as B inner join sdn.vnet_instance_controller
+		on B.resource_id=sdn.vnet_instance_controller.controller_id) as C inner join sdn.vnet_instance
+		on C.instance_id=sdn.vnet_instance.instance_id
+		and sdn.vnet_instance.instance_status='ACTIVE')
+		UNION ALL
+		(select sdn.vnet_instance.* from
+		(select sdn.vnet_instance_host.* from
+		(select sdn.vnet_vnet_resource.* from
+		(select * from sdn.vnet_executor_vnet
+		where sdn.vnet_executor_vnet.executor_id=#exe_id#) as D inner join sdn.vnet_vnet_resource
+		on D.vnet_id=sdn.vnet_vnet_resource.vnet_id and sdn.vnet_vnet_resource.resource_status='wait'
+		and sdn.vnet_vnet_resource.resource_type='Host') as E inner join sdn.vnet_instance_host
+		on E.resource_id=sdn.vnet_instance_host.host_id) as F inner join sdn.vnet_instance
+		on F.instance_id=sdn.vnet_instance.instance_id
+		and sdn.vnet_instance.instance_status='ACTIVE')
+	</select>
+	
+	<insert id="insertInstance" parameterClass="Vnet_instance">
+		insert into
+		vnet_instance(instance_id,instance_osid,instance_name,instance_type,instance_zone,instance_status)
+		values(#instance_id#,#instance_osid#,#instance_name#,#instance_type#,#instance_zone#,#instance_status#)
+	</insert>
+	
+	
+	<update id="updateInstance" parameterClass="Vnet_instance">
+		update 
+		vnet_instance
+		set instance_osid=#instance_osid#,
+		instance_status=#instance_status#
+		where instance_id=#instance_id#
+	</update>
+	
+	
+	<delete id="delById" parameterClass="String">
+		delete 
+		from vnet_instance
+		where
+		instance_id=#instance_id#
+	</delete>
+	
+	<select id="getById" resultClass="Vnet_instance" parameterClass="String" >
+		select *
+		from vnet_instance
+		where 
+		instance_id=#instance_id#
+	</select>
+	
+	<select id="getInstanceidByosid" resultClass="String" parameterClass="String">
+         select instance_id
+         from vnet_instance
+         where
+         instance_osid=#instance_osid#	  
+	</select>
+	
+</sqlMap>

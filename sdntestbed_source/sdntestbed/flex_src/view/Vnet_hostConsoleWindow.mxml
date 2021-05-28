@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>  
+<utils:MyTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"   
+			   xmlns:s="library://ns.adobe.com/flex/spark"   
+			   xmlns:mx="library://ns.adobe.com/flex/mx" 
+			   xmlns:utils="utils.*"
+			   xmlns:flexiframe="flexiframe.*"      
+			   width="800" height="500" x="250" y="50"
+			   layout="vertical"
+			   initialize="init()"
+			   close="this.parent.removeChild(this)" showCloseButton="true"
+			   verticalScrollPolicy="auto" horizontalScrollPolicy="auto" dropShadowVisible="true">
+	
+	<fx:Script>
+		<![CDATA[
+			import Components.Controller;
+			import Components.Host;
+			
+			import mx.controls.Alert;
+			import mx.core.FlexGlobals;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			
+			private var source_url:String;
+			
+			protected function init():void{
+//				var item_id:String;
+//				var ins_id:String;
+//				if(FlexGlobals.topLevelApplication.activeItem.className == "Host"){
+//					item_id = Controller(FlexGlobals.topLevelApplication.activeItem).getCon_id();
+//					for(var i:int=0; i<FlexGlobals.topLevelApplication.vnet_instance_controller.length; i++){
+//						if(FlexGlobals.topLevelApplication.vnet_instance_controller[i].controller_id == item_id){
+//							ins_id = FlexGlobals.topLevelApplication.vnet_instance_controller[i].instance_id;
+//							break;
+//						}
+//					}
+//				}
+//				else{
+//					item_id = Host(FlexGlobals.topLevelApplication.activeItem).getHost_ID();
+//					for(var j:int=0; j<FlexGlobals.topLevelApplication.vnet_instance_host.length; j++){
+//						if(FlexGlobals.topLevelApplication.vnet_instance_host[j].host_id == item_id){
+//							ins_id = FlexGlobals.topLevelApplication.vnet_instance_host[j].instance_id;
+//							break;
+//						}
+//					}
+//				}
+//				Vnet_OpsNovaService.getVncUrl(ins_id);
+				this.title="console: " + FlexGlobals.topLevelApplication.activeItem.title;
+				this.addEventListener(Event.RESIZE, titleWindowResized);
+			}
+			
+			protected function titleWindowResized(event:Event):void{
+				
+				this.addEventListener(MouseEvent.MOUSE_UP, resizeCompleted);
+			}
+			
+			protected function resizeCompleted(event:MouseEvent):void{
+				
+				this.removeEventListener(MouseEvent.MOUSE_UP, resizeCompleted);
+			}
+			
+			
+
+		]]>
+	</fx:Script>
+	<flexiframe:IFrame id="console" x="0" y="0"
+					   source="{FlexGlobals.topLevelApplication.vnc_url}" width="100%" height="100%">  
+	</flexiframe:IFrame> 
+   
+</utils:MyTitleWindow> 

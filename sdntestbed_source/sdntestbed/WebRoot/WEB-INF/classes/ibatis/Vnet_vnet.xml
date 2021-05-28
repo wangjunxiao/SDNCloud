@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Vnet_vnet">
+
+	<typeAlias alias="Vnet_vnet" type="cn.dlut.entity.Vnet_vnet" />
+
+	<resultMap class="Vnet_vnet" id="Vnet_vnet">
+		<result property="vnet_id" column="vnet_id" />
+		<result property="vnet_name" column="vnet_name" />
+		<result property="vnet_status" column="vnet_status" />
+
+	</resultMap>
+	
+	<update id="updateVnet" parameterClass="Vnet_vnet">
+		update vnet_vnet
+		set vnet_status=#vnet_status#
+		where vnet_id=#vnet_id#		
+	</update>
+
+	<select id="getAll" resultClass="Vnet_vnet">
+		select * from vnet_vnet
+	</select>
+	
+	<select id="getById" resultClass="Vnet_vnet" parameterClass="String" >
+		select * from vnet_vnet where vnet_id=#vnet_id#
+	</select>
+	
+	<insert id="insertVnet" parameterClass="Vnet_vnet">
+		insert into
+		vnet_vnet(vnet_id,vnet_name,vnet_status)
+		values(#vnet_id#,#vnet_name#,#vnet_status#)
+	</insert>
+
+	
+	<delete id="delById" parameterClass="String">
+		delete from vnet_vnet where vnet_id=#vnet_id#	
+	</delete>
+	
+</sqlMap>

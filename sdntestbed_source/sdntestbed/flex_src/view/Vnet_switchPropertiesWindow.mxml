@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark"    
+			   xmlns:mx="library://ns.adobe.com/flex/mx" width="344" height="330" initialize="init()"
+			   close="PopUpManager.removePopUp(this)" backgroundColor="#F2EBEB" dropShadowVisible="true" borderVisible="true" borderColor="#CEBCBC">
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	
+	<fx:Declarations>
+		<s:RemoteObject id="Vnet_JavaToFlexService" destination="Vnet_JavaToFlexService" >
+			<s:method name="usersubnet_JavaToFlex" fault="faultHandler(event)" result="usersubnetJavaToFlex_resultHandler(event)"/>
+		</s:RemoteObject>
+		
+		<mx:RemoteObject id="Vnet_UserResourceService" destination="Vnet_UserResourceService" >
+			<mx:method name="userip_FlexToJava" fault="faultHandler(event)" result="userip_FlexToJava_resultHandler(event)"/>	
+			<mx:method name="usersubnet_ipFlexToJava" fault="faultHandler(event)" result="usersubnet_ipFlexToJava_resultHandler(event)"/>	
+		</mx:RemoteObject>
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import Components.Host;
+			import Components.Switch;
+			
+			import mx.collections.ArrayCollection;
+			import mx.collections.XMLListCollection;
+			import mx.controls.Alert;
+			import mx.core.FlexGlobals;
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			import mx.rpc.xml.SimpleXMLEncoder;
+			
+			import spark.events.IndexChangeEvent;
+			
+			private var selectimage:int; 
+			private var selectflavor:int;
+			private var selectsubnet:String;
+			private var user_subnet:String;
+			
+			private var change:Boolean = false;
+			
+			[Bindable]
+			private var typeList:ArrayCollection = new ArrayCollection(["secure", "standalone"]);
+			
+			protected function init():void{
+				Vnet_JavaToFlexService.usersubnet_JavaToFlex();
+			}
+			
+			protected function usersubnet_ipFlexToJava_resultHandler(event:ResultEvent):void{
+			}
+			
+			protected function userip_FlexToJava_resultHandler(event:ResultEvent):void{
+			}
+			
+			protected function usersubnetJavaToFlex_resultHandler(event:ResultEvent):void{
+			}
+			
+			protected function faultHandler(event:FaultEvent):void{        
+				Alert.show("Fault:"+event.fault.toString());
+				
+			}
+			
+			
+			protected function button_clickHandler(event:MouseEvent):void{
+			}
+			
+			
+			protected function type_changeHandler(event:IndexChangeEvent):void{  
+				FlexGlobals.topLevelApplication.activeItem.type = String(type.selectedItem);
+			}  
+			
+			protected function showtype():String{
+				var res:String = "";
+				if(FlexGlobals.topLevelApplication.activeItem.type != null){
+					res = FlexGlobals.topLevelApplication.activeItem.type;
+				}
+				return res;
+			}
+			
+			
+		]]>
+	</fx:Script>
+	
+	<mx:TabNavigator y="5.5" width="329" height="287"  horizontalCenter="-1" backgroundColor="#ECDFDF">
+		<s:NavigatorContent label="Configuration" width="100%" height="100%" backgroundColor="#E8DDDD">	
+			<s:Button x="7" y="-2" label="Configuration" height="22" width="313"/>
+			<s:VGroup x="15" y="36" width="113" height="152" gap="28" horizontalAlign="right" paddingTop="10">
+				<s:Label text="Title" fontSize="15"/>
+				<s:Label text="Name" fontSize="15"/>
+				<s:Label text="Type" fontSize="15"/>
+			</s:VGroup>
+			<s:Label x="159" y="47" text="{FlexGlobals.topLevelApplication.activeItem.title}"/>
+			<s:TextInput x="159" y="85" text="{FlexGlobals.topLevelApplication.activeItem.getName()}" id="_name"/>
+			<s:DropDownList x="159" y="130" id="type" dataProvider="{typeList}" prompt="{showtype()}" change="type_changeHandler(event)" width="129"/>
+			<s:Button x="121" y="210" label="Apply" width="100" click="button_clickHandler(event)"/>
+		</s:NavigatorContent>
+		<s:NavigatorContent label="Advanced" width="100%" height="100%" backgroundColor="#E8DDDD">	
+			<s:Button x="7" y="-2" label="Advanced" height="22" width="313"/>
+			<s:VGroup x="18" y="45" width="113" height="152" gap="30" horizontalAlign="right" paddingTop="10">
+				<s:Label text="Queen" height="15"/>
+				<s:Label text="QoS" height="15"/>
+				<s:Label text="monitor" height="15"/>
+			</s:VGroup>
+			<s:Button x="121" y="210" label="Apply" width="100" click="button_clickHandler(event)"/>
+		</s:NavigatorContent>
+		<s:NavigatorContent label="more.." width="100%" height="100%"/>
+	</mx:TabNavigator>
+</s:TitleWindow>

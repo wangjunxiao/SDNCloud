@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Vnet_controller">
+
+	<typeAlias alias="Vnet_controller" type="cn.dlut.entity.Vnet_controller" />
+
+	<resultMap class="Vnet_controller" id="Vnet_controller">
+		<result property="controller_id" column="controller_id" />
+		<result property="controller_name" column="controller_name" />
+		<result property="controller_type" column="controller_type" />
+		<result property="floatingip_id" column="floatingip_id" />
+	</resultMap>
+
+	<select id="getAll" resultClass="Vnet_controller">
+		select * from vnet_controller
+	</select>
+	
+	<select id="getAllbyStatus" resultClass="Vnet_controller" parameterClass="Integer" >
+		select sdn.Vnet_controller.* from
+		(select sdn.vnet_vnet_resource.* from
+		(select * from sdn.vnet_executor_vnet
+		where sdn.vnet_executor_vnet.executor_id=#exe_id#) as A inner join sdn.vnet_vnet_resource
+		on A.vnet_id=sdn.vnet_vnet_resource.vnet_id and sdn.vnet_vnet_resource.resource_status='wait'
+		and sdn.vnet_vnet_resource.resource_type='Controller') as B inner join sdn.vnet_Controller
+		on B.resource_id=sdn.vnet_controller.controller_id
+	</select>
+	
+	<update id="updateController" parameterClass="Vnet_controller">
+		update vnet_controller
+		set floatingip_id=#floatingip_id#
+		where controller_id=#controller_id#
+	</update>
+	
+	<select id="getById" resultClass="Vnet_controller" parameterClass="String" >
+		select * from vnet_controller where controller_id=#controller_id#
+	</select>
+	
+	<insert id="insertController" parameterClass="Vnet_controller">
+		insert into
+		vnet_controller(controller_id,controller_name,controller_type,floatingip_id)
+		values(#controller_id#,#controller_name#,#controller_type#,#floatingip_id#)
+	</insert>
+	
+	<delete id="delById" parameterClass="String">
+		delete from vnet_controller where controller_id=#controller_id#	
+	</delete>
+	
+</sqlMap>

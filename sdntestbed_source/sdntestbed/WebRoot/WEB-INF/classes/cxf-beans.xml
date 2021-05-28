@@ -1,0 +1,47 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:util="http://www.springframework.org/schema/util" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:cxf="http://cxf.apache.org/core" 
+	xmlns:jaxws="http://cxf.apache.org/jaxws"
+	xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+	xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
+http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
+http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
+<cxf:bus>
+	<cxf:features>
+		<cxf:logging />
+	</cxf:features>
+</cxf:bus>
+	<jaxrs:client id="proxyService" address="http://112.126.126.200:8080/domainstore/json" serviceClass="com.hichina.proxy.restful.RestfulProxyService">
+		<jaxrs:providers>
+			<ref bean="jsonProvider" />
+		</jaxrs:providers>
+	   <jaxrs:headers>
+     	  <entry key="Accept" value="*/*"/>
+ 	   </jaxrs:headers>
+	</jaxrs:client>
+
+	
+	<bean id="jsonProvider" class="org.apache.cxf.jaxrs.provider.JSONProvider">
+		<property name="serializeAsArray" value="true" />
+		<property name="dropRootElement" value="true" />
+		<property name="supportUnwrapped" value="true" />
+		<property name="produceMediaTypes" ref="jsonTypes" />
+		<property name="consumeMediaTypes" ref="jsonTypes" />
+		<property name="arrayKeys" ref="arrayKeys" />		
+	</bean>	
+	
+	<util:list id="jsonTypes">
+		<value>*/*</value>
+	</util:list>
+	
+	<util:list id="arrayKeys">
+		<value>results</value>
+		<value>checkResults</value>
+		<value>status</value>
+	</util:list>
+
+</beans>

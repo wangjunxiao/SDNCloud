@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Vnet_image">
+
+	<typeAlias alias="Vnet_image" type="cn.dlut.entity.Vnet_image" />
+
+	<resultMap class="Vnet_image" id="Vnet_image">
+		<result property="image_id" column="image_id" />
+		<result property="image_osid" column="image_osid" />
+		<result property="image_name" column="image_name" />
+		<result property="image_format" column="image_format" />
+		<result property="image_size" column="image_size" />
+	</resultMap>
+
+	<select id="getAll" resultClass="Vnet_image">
+		select * from vnet_image
+	</select>
+	
+	<select id="getById" resultClass="Vnet_image" parameterClass="Integer">
+		select *
+		from vnet_image
+		where image_id=#image_id#
+	</select>
+	
+	<insert id="updateImage" parameterClass="Vnet_image">
+		insert into
+		vnet_image(image_osid,image_name,image_format,image_size)
+		values(#image_osid#,#image_name#,#image_format#,#image_size#)
+	</insert>
+	
+	<delete id="delById" parameterClass="Integer">
+		delete from vnet_image
+		where
+		image_id=#image_id#
+		
+	</delete>
+	
+	<select id="getOsid" resultClass="Vnet_image" parameterClass="Integer">
+		select * from vnet_image
+		where
+		image_id=#image_id#
+	</select>
+	
+	<select id="getimage_name" resultClass="Vnet_image" parameterClass="Integer">
+		select image_name from vnet_image
+		where
+		image_id=#image_id#
+	</select>
+	
+</sqlMap>

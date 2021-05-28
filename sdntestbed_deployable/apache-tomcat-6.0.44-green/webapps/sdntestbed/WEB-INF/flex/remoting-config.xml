@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<service id="remoting-service" class="flex.messaging.services.RemotingService">
+
+	<adapters>
+		<adapter-definition id="java-object"
+			class="flex.messaging.services.remoting.adapters.JavaAdapter"
+			default="true" />
+	</adapters>
+
+	<default-channels>
+		<channel ref="my-amf" />
+	</default-channels>
+
+	<destination id="alarmMessageDest">
+		<properties>
+			<factory>spring</factory>
+			<source>alarmSendService</source>
+		</properties>
+	</destination>
+
+	<destination id="helloWorld">
+		<properties>
+			<source>test.flex.HelloWorld</source>
+		</properties>
+	</destination>
+
+	<destination id="FlowEntryService">
+		<properties>
+			<factory>spring</factory>
+			<source>FlowEntryService</source>
+			<include-methods>
+				<method name="createFlowEntry" />
+				<method name="deleteFlowEntry" />
+				<method name="queryFlowEntry" />
+			</include-methods>
+		</properties>
+	</destination>
+
+	<destination id="show_firewall_enable">
+		<properties>
+			<factory>spring</factory>
+			<source>RyuService</source>
+			<include-methods>
+				<method name="FireWallEnable" />
+			</include-methods>
+		</properties>
+	</destination>
+
+	<destination id="MenuService">
+		<properties>
+			<factory>spring</factory>
+			<source>MenuService</source>
+			<include-methods>
+				<method name="addController" />
+			</include-methods>
+		</properties>
+	</destination>
+
+	<destination id="AclRuleService">
+		<properties>
+			<factory>spring</factory>
+			<source>AclRuleService</source>
+			<include-methods>
+				<method name="AddRule" />
+				<method name="DeleteRule" />
+				<method name="QueryRule" />
+			</include-methods>
+		</properties>
+	</destination>
+
+	<destination id="testtService">
+		<properties>
+			<factory>spring</factory>
+			<source>TesttService</source>
+		</properties>
+	</destination>
+
+	<!-- <scope>application</scope> request(default) session application <include-methods> 
+		Allow access <method name="controller_getAll"/> <method name="switch_getAll"/> 
+		<method name="flow_getAll"/> <method name="port_getAll"/> <method name="host_getAll"/> 
+		<method name="link_getAll"/> </include-methods> <exclude-methods> Access 
+		forbidden </exclude-methods> -->
+	<destination id="dbInfo_getAll_Service">
+		<properties>
+			<factory>spring</factory>
+			<source>DBInfoService</source>
+			<include-methods>
+				<method name="controller_getAll" />
+				<method name="switch_getAll" />
+				<method name="flow_getAll" />
+				<method name="port_getAll" />
+				<method name="host_getAll" />
+				<method name="link_getAll" />
+				<method name="portStats_getAll" />
+			</include-methods>
+		</properties>
+	</destination>
+
+
+
+	<destination id="dbInfo_getById_Service">
+		<properties>
+			<factory>spring</factory>
+			<source>DBInfoService</source>
+			<include-methods>
+				<method name="controller_getById" />
+				<method name="switch_getById" />
+				<method name="flow_getById" />
+				<method name="port_getById" />
+				<method name="host_getById" />
+				<method name="link_getById" />
+				<method name="getPortStatsByDpID"/>
+			</include-methods>
+		</properties>
+	</destination>
+
+	<destination id="dbInfo_insert_Service">
+		<properties>
+			<factory>spring</factory>
+			<source>DBInfoService</source>
+			<include-methods>
+				<method name="controller_insert" />
+				<method name="switch_insert" />
+				<method name="flow_insert" />
+				<method name="port_insert" />
+				<method name="host_insert" />
+				<method name="link_insert" />
+			</include-methods>
+		</properties>
+	</destination>
+
+	<destination id="dbInfo_delById_Service">
+		<properties>
+			<factory>spring</factory>
+			<source>DBInfoService</source>
+			<include-methods>
+				<method name="controller_delById" />
+				<method name="switch_delById" />
+				<method name="flow_delById" />
+				<method name="port_delById" />
+				<method name="host_delById" />
+				<method name="link_delById" />
+			</include-methods>
+		</properties>
+	</destination>
+
+	<destination id="dbInfo_getId_Service">
+		<properties>
+			<factory>spring</factory>
+			<source>DBInfoService</source>
+			<include-methods>
+				<method name="switch_getId" />
+				<method name="port_getId" />
+			</include-methods>
+		</properties>
+	</destination>
+
+	<destination id="dbInfo_delAll_Service">
+		<properties>
+			<factory>spring</factory>
+			<source>DBInfoService</source>
+			<include-methods>
+				<method name="switch_delAll" />
+				<method name="flow_delAll" />
+				<method name="host_delAll" />
+				<method name="port_delAll" />
+				<method name="link_delAll" />
+			</include-methods>
+		</properties>
+	</destination>
+
+
+
+	<destination id="CoordinatorService">
+		<properties>
+			<factory>spring</factory>
+			<source>CoordinatorService</source>
+			<include-methods>
+				<method name="AddController" />
+				<method name="DeleteController" />
+				<method name="GetControllerPktIn" />
+				<method name="InitController"/>
+			</include-methods>
+		</properties>
+	</destination>
+	
+	<destination id="Vnet_ShowinstanceService">
+		<properties>
+			<factory>spring</factory>
+			<source>Vnet_ShowinstanceService</source>
+			<include-methods>
+				<method name="queryInstance" />
+			</include-methods>
+		</properties>
+	</destination>
+
+	
+	<destination id="Vnet_ShowflavorService">
+		<properties>
+			<factory>spring</factory>
+			<source>Vnet_ShowflavorService</source>
+			<include-methods>
+				<method name="queryFlavor" />
+			</include-methods>
+		</properties>
+	</destination>
+
+	<destination id="Vnet_ShowimageService">
+		<properties>
+			<factory>spring</factory>
+			<source>Vnet_ShowimageService</source>
+			<include-methods>
+				<method name="queryImage" />
+			</include-methods>
+		</properties>
+	</destination>
+	
+	<destination id="Vnet_LoginService">
+		<properties>
+			<factory>spring</factory>
+			<source>Vnet_LoginService</source>
+			<include-methods>
+				<method name="Auth" />
+			</include-methods>
+		</properties>
+	</destination>
+	
+	<destination id="Vnet_FlexToJavaService">
+		<properties>
+			<factory>spring</factory>
+			<source>Vnet_FlexToJavaService</source>
+			<include-methods>
+				<method name="FlexToJava" />
+			</include-methods>
+		</properties>
+	</destination>
+	
+	<destination id="Vnet_JavaToFlexService">
+		<properties>
+			<factory>spring</factory>
+			<source>Vnet_JavaToFlexService</source>
+			<include-methods>
+				<method name="instanceJavaToFlex" />
+				<method name="controllerJavaToFlex" />
+				<method name="switchJavaToFlex" />
+				<method name="hostJavaToFlex" />
+				<method name="oflinkJavaToFlex" />
+				<method name="linkJavaToFlex" />
+				<method name="e_vJavaToFlex" />
+				<method name="ofportJavaToFlex" />
+				<method name="switch_ofportJavaToFlex" />
+				<method name="imageJavaToFlex" />
+				<method name="flavorJavaToFlex" />
+				<method name="image_instanceJavaToFlex" />
+				<method name="flavor_instanceJavaToFlex" />
+				<method name="instance_hostJavaToFlex" />
+				<method name="instance_controller" />
+				<method name="usersubnet_JavaToFlex" />
+				<method name="userip_JavaToFlex" />
+				<method name="subnet_ipJavaToFlex" />
+				<method name="script_JavaToFlex" />
+				<method name="instanceIP_JavaToFlex" />
+				<method name="queryVnet" />
+			</include-methods>
+		</properties>
+	</destination>
+	
+	<destination id="Vnet_OpsNovaService">
+		<properties>
+			<factory>spring</factory>
+			<source>Vnet_OpsNovaService</source>
+			<include-methods>
+				<method name="getvnclist" />
+				<method name="getVncUrl" />
+			</include-methods>
+		</properties>
+	</destination>
+	
+	<destination id="Vnet_UserResourceService">
+		<properties>
+			<factory>spring</factory>
+			<source>Vnet_UserResourceService</source>
+			<include-methods>
+				<method name="usersubnet_FlexToJava" />
+				<method name="usersubnet_Update" />
+				<method name="usersubnet_Delete" />
+				<method name="vnet_subnet_FlexToJava" />
+				<method name="userip_FlexToJava" />
+				<method name="usersubnet_ipFlexToJava" />
+				
+			</include-methods>
+		</properties>
+	</destination>
+	
+</service>
+
+	

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Vnet_executor">
+
+	<typeAlias alias="Vnet_executor" type="cn.dlut.entity.Vnet_executor" />
+
+	<resultMap class="Vnet_executor" id="Vnet_executor">
+		<result property="executor_id" column="executor_id" />
+		<result property="executor_name" column="executor_name" />
+		<result property="executor_password" column="executor_password" />
+		<result property="executor_quota_host" column="executor_quota_host" />
+		<result property="executor_quota_controller" column="executor_quota_controller" />
+		<result property="executor_quota_switch" column="executor_quota_switch" />
+		<result property="executor_quota_vnet" column="executor_quota_vnet" />
+		<result property="executor_role" column="executor_role" />
+	</resultMap>
+
+	<select id="getAll" resultClass="Vnet_executor">
+		select * from vnet_executor
+	</select>
+	
+	<select id="getByNameAndPassword" resultClass="Vnet_executor" parameterClass="Map" >
+		select * from vnet_executor where executor_name=#executor_name# and executor_password=#executor_password#
+	</select>
+	
+	<select id="getById" resultClass="Vnet_executor" parameterClass="Integer" >
+		select * from vnet_executor where executor_id=#executor_id#
+	</select>
+	
+	<insert id="insertExecutor" parameterClass="Vnet_executor">
+		insert into
+		vnet_executor(executor_name,executor_password,executor_quota_host,executor_quota_controller,executor_quota_switch,executor_quota_vnet,executor_role)
+		values(#executor_name#,#executor_password#,#executor_quota_host#,#executor_quota_controller#,#executor_quota_switch#,#executor_quota_vnet#,#executor_role#)
+	</insert>
+	
+	<delete id="delById" parameterClass="Integer">
+		delete from vnet_executor  where executor_id=#executor_id#	
+	</delete>
+	
+</sqlMap>

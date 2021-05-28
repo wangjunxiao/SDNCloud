@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Vnet_instance_host">
+
+	<typeAlias alias="Vnet_instance_host" type="cn.dlut.entity.Vnet_instance_host" />
+
+	<resultMap class="Vnet_instance_host" id="Vnet_instance_host">
+		<result property="instance_host_id" column="instance_host_id" />
+		<result property="instance_id" column="instance_id" />
+		<result property="host_id" column="host_id" />
+	</resultMap>
+
+	<select id="getAll" resultClass="Vnet_instance_host">
+		select * from vnet_instance_host
+	</select>
+	
+	<select id="getAllActive" resultClass="Vnet_instance_host" parameterClass="Integer">
+		select sdn.vnet_instance_host.* from
+		(select sdn.vnet_vnet_resource.* from
+		(select * from sdn.vnet_executor_vnet
+		where sdn.vnet_executor_vnet.executor_id=#exe_id#) as A inner join sdn.vnet_vnet_resource
+		on A.vnet_id=sdn.vnet_vnet_resource.vnet_id and sdn.vnet_vnet_resource.resource_status='wait'
+		and sdn.vnet_vnet_resource.resource_type='Host') as B inner join sdn.vnet_instance_host
+		on B.resource_id=sdn.vnet_instance_host.host_id
+	</select>
+	
+	
+	<select id="getById" resultClass="Vnet_instance_host" parameterClass="Integer">
+		select *
+		from vnet_instance_host
+		where instance_host_id=#instance_host_id#
+	</select>
+	
+	<select id="getByInstance_id" resultClass="Vnet_instance_host" parameterClass="String">
+		select *
+		from vnet_instance_host
+		where instance_id=#instance_id#
+	</select>
+	
+	<select id="getByHost_id" resultClass="Vnet_instance_host" parameterClass="String">
+		select *
+		from vnet_instance_host
+		where host_id=#host_id#
+	</select>
+	
+	<insert id="insertInstance_host" parameterClass="Vnet_instance_host">
+		insert into
+		vnet_instance_host(instance_id,host_id)
+		values(#instance_id#,#host_id#)
+	</insert>
+	
+	<select id="getInstance_id" resultClass="Vnet_instance_host" parameterClass="String">
+		select * 
+		from vnet_instance_host
+		where host_id=#host_id#
+		
+	</select>
+	
+	<delete id="deleteInstanceHost" parameterClass="Vnet_instance_host">
+		delete from vnet_instance_host
+		where
+		instance_host_id=#instance_host_id#
+	</delete>
+	
+		
+</sqlMap>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Vnet_image_instance">
+
+	<typeAlias alias="Vnet_image_instance" type="cn.dlut.entity.Vnet_image_instance" />
+
+	<resultMap class="Vnet_image_instance" id="Vnet_image_instance">
+		<result property="image_instance_id" column="image_instance_id" />
+		<result property="image_id" column="image_id" />
+		<result property="instance_id" column="instance_id" />
+
+	</resultMap>
+
+	<select id="getAll" resultClass="Vnet_image_instance">
+		select * from vnet_image_instance
+	</select>
+	
+	<select id="getAllActive" resultClass="Vnet_image_instance" parameterClass="Integer">
+		select sdn.vnet_image_instance.* from 
+		((select sdn.vnet_instance.* from
+		(select sdn.vnet_instance_controller.* from
+		(select sdn.vnet_vnet_resource.* from
+		(select * from sdn.vnet_executor_vnet
+		where sdn.vnet_executor_vnet.executor_id=#exe_id#) as A inner join sdn.vnet_vnet_resource
+		on A.vnet_id=sdn.vnet_vnet_resource.vnet_id and sdn.vnet_vnet_resource.resource_status='wait'
+		and sdn.vnet_vnet_resource.resource_type='Controller') as B inner join sdn.vnet_instance_controller
+		on B.resource_id=sdn.vnet_instance_controller.controller_id) as C inner join sdn.vnet_instance
+		on C.instance_id=sdn.vnet_instance.instance_id
+		and sdn.vnet_instance.instance_status='ACTIVE')
+		UNION ALL
+		(select sdn.vnet_instance.* from
+		(select sdn.vnet_instance_host.* from
+		(select sdn.vnet_vnet_resource.* from
+		(select * from sdn.vnet_executor_vnet
+		where sdn.vnet_executor_vnet.executor_id=#exe_id#) as D inner join sdn.vnet_vnet_resource
+		on D.vnet_id=sdn.vnet_vnet_resource.vnet_id and sdn.vnet_vnet_resource.resource_status='wait'
+		and sdn.vnet_vnet_resource.resource_type='Host') as E inner join sdn.vnet_instance_host
+		on E.resource_id=sdn.vnet_instance_host.host_id) as F inner join sdn.vnet_instance
+		on F.instance_id=sdn.vnet_instance.instance_id
+		and sdn.vnet_instance.instance_status='ACTIVE')) as G inner join sdn.vnet_image_instance
+		on G.instance_id=sdn.vnet_image_instance.instance_id
+	</select>
+	
+	<select id="getById" resultClass="Vnet_image_instance" parameterClass="Integer">
+		select *
+		from vnet_image_instance
+		where image_instance_id=#image_instance_id#
+	</select>
+	
+	<insert id="insert" parameterClass="Vnet_image_instance">
+		insert into
+		vnet_image_instance(image_id,instance_id)
+		values(#image_id#,#instance_id#)
+	</insert>
+	
+	<delete id="deleteImageInstance" parameterClass="Integer">
+		delete from vnet_image_instance
+		where
+		image_instance_id=#image_instance_id#
+	</delete>
+		
+</sqlMap>

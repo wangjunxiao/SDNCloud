@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" minHeight="600">
+	<fx:Script source="../utils/CryptoUtil.as"/>
+	
+	<fx:Declarations>
+		<mx:RemoteObject id="Vnet_LoginService" destination="Vnet_LoginService" >
+			<mx:method name="Auth" fault="faultHandler(event)" result="Login_resultHandler(event)"/>	
+		</mx:RemoteObject>
+	</fx:Declarations>
+	
+	<fx:Script>  
+		<![CDATA[ 
+			import mx.controls.Alert;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			
+			import vo.Vnet_executor;
+			
+			
+			private var executor_Name:String;
+			private var executor_Password:String;
+			
+			private function faultHandler(event:FaultEvent):void{        
+				Alert.show("Fault:"+event.fault.toString());
+			}
+			
+			protected function Login_clickHandler(event:MouseEvent):void 
+			{
+				executor_Name = username.text;
+				executor_Password = password.text;
+				if(executor_Name != "" && executor_Password != ""){
+					//backend Authentication
+					Vnet_LoginService.Auth(executor_Name, executor_Password);
+				}else{
+					Alert.show("The username and password can not be empty!","Prompt"); 
+				} 
+			}
+			
+			private function forwardPage(executor:Vnet_executor):void{
+				ExternalInterface.call("function() {window.location.href=" + "'./Vnet_Workbench.html#" +
+					encryption("executor_name=" + executor.executor_name + "&executor_id=" + executor.executor_id) +
+					"';}");
+			} 
+			
+			private function Login_resultHandler(event:ResultEvent):void{
+				var executor:Vnet_executor = event.result as Vnet_executor;
+				if(event.result != null){
+					//page forward
+					forwardPage(executor);
+				}
+				else {
+					Alert.show("Incorrect username or password!","Prompt");
+				}
+			}
+		]]>  
+	</fx:Script>  
+	
+	<s:Panel x="242" y="107" width="549" height="367" title="Vnet  Login" fontSize="16">  
+		<s:Label x="99" y="106" text="Username: "/>  
+		<s:Label x="100" y="175" text="Password: "/>  
+		<s:TextInput x="179" y="102" id="username"/>  
+		<s:TextInput x="180" y="171" id="password" displayAsPassword="true" />  
+		<s:Button x="409" y="128" height="48" id="login" label="OK" click="Login_clickHandler(event)" />  
+	</s:Panel>  
+</s:Application>

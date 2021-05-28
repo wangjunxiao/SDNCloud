@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark"    
+			   xmlns:mx="library://ns.adobe.com/flex/mx" width="344" height="330"
+			   close="PopUpManager.removePopUp(this)" backgroundColor="#F2EBEB" dropShadowVisible="true" borderVisible="true" borderColor="#CEBCBC">
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	
+	<fx:Script>
+		<![CDATA[
+			import Components.Controller;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.core.FlexGlobals;
+			import mx.managers.PopUpManager;
+			
+			private var controller_type:ArrayCollection = new ArrayCollection(["floodlight", "ryu", "onos"]);	
+			
+			protected function button1_clickHandler(event:MouseEvent):void
+			{
+				
+				Alert.show("you have changed the configuration!","Success");
+				PopUpManager.removePopUp(this);
+			}
+			
+			protected function is_apply():Boolean{
+				var result:Boolean = true;
+				if(FlexGlobals.topLevelApplication.activeItem.className == "Controller"){
+					for(var i:int=0; i<FlexGlobals.topLevelApplication.vnet_controllers.length; i++){
+						if(FlexGlobals.topLevelApplication.vnet_controllers[i].controller_id ==
+							Controller(FlexGlobals.topLevelApplication.activeItem).getCon_id()){
+							result = false;
+						}
+					}
+					
+				}
+				return result;
+			}
+			
+		]]>
+	</fx:Script>
+	<mx:TabNavigator y="5.5" width="329" height="287"  horizontalCenter="-1" backgroundColor="#ECDFDF">
+		<s:NavigatorContent label="Configuration" width="100%" height="100%" backgroundColor="#E8DDDD">	
+			<s:Button x="7" y="-2" label="Configuration" height="22" width="313"/>
+			<s:VGroup x="17" y="36" width="113" height="152" gap="23" horizontalAlign="right" paddingTop="10">
+				<s:Label text="Title" height="12"/>
+				<s:Label text="type" height="12"/>
+				<s:Label text="IP Address" height="12"/>
+				<s:Label text="args1" height="12"/>
+				<s:Label text="args2" height="12"/>
+			</s:VGroup>
+			<s:Label text="{FlexGlobals.topLevelApplication.activeItem.title}" x="157" y="45" height="12"/>
+			<s:DropDownList id="type" dataProvider="{controller_type}" width="129" x="157" y="75"/>
+			<s:Label text="{FlexGlobals.topLevelApplication.activeItem.controller_ip}" id="_ip" x="157" y="116" height="12"/>
+			<s:Button x="121" y="210" label="Apply" width="100" click="button1_clickHandler(event)" enabled="{is_apply()}"/>
+			<s:Label id="myString" x="400" y="94" fontSize="30"/>
+		</s:NavigatorContent>
+		<s:NavigatorContent label="more..." width="100%" height="100%" backgroundColor="#E8DDDD"/>	
+		<s:NavigatorContent label="more.." width="100%" height="100%"/>
+	</mx:TabNavigator>
+</s:TitleWindow>

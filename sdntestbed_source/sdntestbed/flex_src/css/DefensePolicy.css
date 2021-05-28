@@ -1,0 +1,33 @@
+/* CSS file */
+@namespace s "library://ns.adobe.com/flex/spark";
+@namespace mx "library://ns.adobe.com/flex/mx";
+
+
+s|TabBar{
+	chromeColor:#006BCD;
+	color: #ffffff;
+	fontWeight:bold;
+	fontSize:12;
+}
+
+mx|GridLines{
+	verticalChangeCount:10;
+}
+
+mx|HBox{
+	backgroundColor:#1d6dab;
+}
+
+mx|LineChart{
+	fontSize:12;
+}
+
+mx|PlotChart{
+	fontSize:12;
+}
+
+/*======================================*/
+.statusLable{
+	color:red;
+	textAlign:right;
+}

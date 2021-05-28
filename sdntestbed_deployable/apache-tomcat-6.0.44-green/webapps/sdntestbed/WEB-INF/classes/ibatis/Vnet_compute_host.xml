@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Vnet_compute_host">
+
+	<typeAlias alias="Vnet_compute_host" type="cn.dlut.entity.Vnet_compute_host" />
+
+	<resultMap class="Vnet_compute_host" id="Vnet_compute_host">
+		<result property="compute_host_id" column="compute_host_id" />
+		<result property="compute_id" column="compute_id" />
+		<result property="host_id" column="host_id" />
+	</resultMap>
+
+	<select id="getAll" resultClass="Vnet_compute_host">
+		select * from vnet_compute_host
+	</select>
+	
+	<select id="getByHostId" resultClass="Vnet_compute_host" parameterClass="String">
+		select * from vnet_compute_host
+		where host_id=#host_id#
+	</select>
+	
+	
+	<select id="getById" resultClass="Vnet_compute_host" parameterClass="Integer">
+		select *
+		from vnet_compute_host
+		where compute_host_id=#compute_host_id#
+	</select>
+	
+	
+	<insert id="insertCompute_host" parameterClass="Vnet_compute_host">
+		insert into
+		vnet_compute_host(compute_id,host_id)
+		values(#compute_id#,#host_id#)
+	</insert>
+	
+	<delete id="delById" parameterClass="Integer">
+		delete from vnet_compute_host
+		where
+		compute_host_id=#compute_host_id#
+	</delete>
+	
+</sqlMap>

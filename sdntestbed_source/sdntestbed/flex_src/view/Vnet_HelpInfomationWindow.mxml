@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>  
+<utils:MyTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"   
+			   xmlns:s="library://ns.adobe.com/flex/spark"   
+			   xmlns:mx="library://ns.adobe.com/flex/mx" 
+			   xmlns:utils="utils.*"
+			   width="460" height="550" x="450" y="70"
+			   layout="vertical"
+			   initialize="init()"
+			   close="this.parent.removeChild(this)" showCloseButton="true"
+			   verticalScrollPolicy="auto" horizontalScrollPolicy="auto" dropShadowVisible="true">
+	
+	<fx:Script>
+		<![CDATA[
+			import Components.Controller;
+			import Components.Host;
+			
+			import mx.controls.Alert;
+			import mx.core.FlexGlobals;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			
+			[Bindable]
+			private var helpInfo:String = "";
+			
+			protected function init():void{
+				myService.send();
+				this.title="help information";
+				this.addEventListener(Event.RESIZE, titleWindowResized);
+			}
+			
+			protected function titleWindowResized(event:Event):void{
+				
+				this.addEventListener(MouseEvent.MOUSE_UP, resizeCompleted);
+			}
+			
+			protected function resizeCompleted(event:MouseEvent):void{
+				
+				this.removeEventListener(MouseEvent.MOUSE_UP, resizeCompleted);
+			}
+			
+			private function resultHandler(event:ResultEvent):void {
+				helpInfo = event.result as String;
+			}
+			
+			
+
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+	<mx:HTTPService id="myService" url="dataprovider/help.txt" result="resultHandler(event)" />
+	</fx:Declarations>
+	
+	<mx:Text id="info" text="{helpInfo}" />
+	
+</utils:MyTitleWindow> 

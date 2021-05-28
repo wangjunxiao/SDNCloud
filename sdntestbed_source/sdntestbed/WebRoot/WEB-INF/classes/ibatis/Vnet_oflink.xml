@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Vnet_oflink">
+
+	<typeAlias alias="Vnet_oflink" type="cn.dlut.entity.Vnet_oflink" />
+
+	<resultMap class="Vnet_oflink" id="Vnet_oflink">
+		<result property="oflink_id" column="oflink_id" />
+		<result property="switch_id" column="switch_id" />
+		<result property="controller_id" column="controller_id" />
+		<result property="oflink_status" column="oflink_status" />
+
+	</resultMap>
+
+	<select id="getAll" resultClass="Vnet_oflink">
+		select * from vnet_oflink
+	</select>
+	
+	<select id="getAllbyStatus" resultClass="Vnet_oflink" parameterClass="Integer">
+		select sdn.vnet_oflink.* from
+		(select sdn.vnet_vnet_resource.* from
+		(select * from sdn.vnet_executor_vnet
+		where sdn.vnet_executor_vnet.executor_id=#exe_id#) as A inner join sdn.vnet_vnet_resource
+		on A.vnet_id=sdn.vnet_vnet_resource.vnet_id and sdn.vnet_vnet_resource.resource_status='wait'
+		and sdn.vnet_vnet_resource.resource_type='oflink') as B inner join sdn.vnet_oflink
+		on B.resource_id=sdn.vnet_oflink.oflink_id
+		and sdn.vnet_oflink.oflink_status='ACTIVE'
+	</select>
+	
+	<select id="getById" resultClass="Vnet_oflink" parameterClass="String">
+		select *
+		from vnet_oflink
+		where oflink_id=#oflink_id#
+	</select>
+	
+	<insert id="insertOflink" parameterClass="Vnet_oflink">
+		insert into
+
+		vnet_oflink(oflink_id,switch_id,controller_id,oflink_status)
+		values(#oflink_id#,#switch_id#,#controller_id#,#oflink_status#)
+
+	</insert>
+	
+	<update id="updateOflink" parameterClass="Vnet_oflink">
+		update vnet_oflink
+		set oflink_status=#oflink_status#
+		where oflink_id=#oflink_id#
+		
+	</update>
+	
+	<delete id="delById" parameterClass="String">
+		delete FROM vnet_oflink where oflink_id=#oflink_id#
+	</delete>
+	
+	
+</sqlMap>

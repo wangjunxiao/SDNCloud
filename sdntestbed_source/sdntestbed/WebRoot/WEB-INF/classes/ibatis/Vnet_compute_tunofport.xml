@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Vnet_compute_tunofport">
+
+	<typeAlias alias="Vnet_compute_tunofport" type="cn.dlut.entity.Vnet_compute_tunofport" />
+
+	<resultMap class="Vnet_compute_tunofport" id="Vnet_compute_tunofport">
+		<result property="compute_tunofport_id" column="compute_tunofport_id" />
+		<result property="compute_id" column="compute_id" />
+		<result property="tunofport_id" column="tunofport_id" />
+	</resultMap>
+
+	<select id="getAll" resultClass="Vnet_compute_tunofport">
+		select * from vnet_compute_tunofport
+	</select>
+	
+	<select id="getByComputeId" resultClass="Vnet_compute_tunofport" parameterClass="Integer">
+		select * from vnet_compute_tunofport
+		where compute_id=#compute_id#
+	</select>	
+	
+	
+	<select id="getById" resultClass="Vnet_compute_tunofport" parameterClass="Integer">
+		select *
+		from vnet_compute_tunofport
+		where compute_tunofport_id=#compute_tunofport_id#
+	</select>
+	
+	<insert id="insertCompute_tunofport" parameterClass="Vnet_compute_tunofport">
+		insert into
+		vnet_compute_tunofport(compute_id,tunofport_id)
+		values(#compute_id#,#tunofport_id#)
+	</insert>
+	
+	<delete id="delById" parameterClass="Integer">
+		delete from vnet_compute_tunofport
+		where
+		compute_tunofport_id=#compute_tunofport_id#
+	</delete>
+		
+</sqlMap>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Vnet_compute_switch">
+
+	<typeAlias alias="Vnet_compute_switch" type="cn.dlut.entity.Vnet_compute_switch" />
+
+	<resultMap class="Vnet_compute_switch" id="Vnet_compute_switch">
+		<result property="compute_switch_id" column="compute_switch_id" />
+		<result property="compute_id" column="compute_id" />
+		<result property="switch_id" column="switch_id" />
+	</resultMap>
+
+	<select id="getAll" resultClass="Vnet_compute_switch">
+		select * from vnet_compute_switch
+	</select>
+	
+	<select id="getById" resultClass="Vnet_compute_switch" parameterClass="Integer">
+		select *
+		from vnet_compute_switch
+		where compute_switch_id=#compute_switch_id#
+	</select>
+
+	<select id="getBySwitchId" resultClass="Vnet_compute_switch" parameterClass="String">
+		select *
+		from vnet_compute_switch
+		where switch_id=#switch_id#
+	</select>	
+	
+	<insert id="insertCompute_switch" parameterClass="Vnet_compute_switch">
+		insert into
+		vnet_compute_switch(compute_id,switch_id)
+		values(#compute_id#,#switch_id#)
+	</insert>
+	
+	<delete id="delById" parameterClass="Integer">
+		delete from vnet_compute_switch
+		where
+		compute_switch_id=#compute_switch_id#
+	</delete>
+		
+</sqlMap>

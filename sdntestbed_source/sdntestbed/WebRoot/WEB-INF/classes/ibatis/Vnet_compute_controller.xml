@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Vnet_compute_controller">
+
+	<typeAlias alias="Vnet_compute_controller" type="cn.dlut.entity.Vnet_compute_controller" />
+
+	<resultMap class="Vnet_compute_controller" id="Vnet_compute_controller">
+		<result property="compute_controller_id" column="compute_controller_id" />
+		<result property="compute_id" column="compute_id" />
+		<result property="controller_id" column="controller_id" />
+	</resultMap>
+
+	<select id="getAll" resultClass="Vnet_compute_controller">
+		select * from vnet_compute_controller
+	</select>
+	
+	<select id="getById" resultClass="Vnet_compute_controller" parameterClass="Integer">
+		select *
+		from vnet_compute_controller
+		where compute_controller_id=#compute_controller_id#
+	</select>
+	
+	<insert id="insertCompute_controller" parameterClass="Vnet_compute_controller">
+		insert into
+		vnet_compute_controller(compute_id,controller_id)
+		values(#compute_id#,#controller_id#)
+	</insert>
+	
+	<select id="getByControllerId" resultClass="Vnet_compute_controller" parameterClass="String">
+		select *
+		from vnet_compute_controller
+		where controller_id=#controller_id#
+	</select>
+	
+	<delete id="delById" parameterClass="Integer">
+		delete from vnet_compute_controller
+		where
+		compute_controller_id=#compute_controller_id#
+	</delete>
+	
+</sqlMap>

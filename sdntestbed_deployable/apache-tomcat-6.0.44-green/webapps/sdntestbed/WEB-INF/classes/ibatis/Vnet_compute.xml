@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Vnet_compute">
+
+	<typeAlias alias="Vnet_compute" type="cn.dlut.entity.Vnet_compute" />
+
+	<resultMap class="Vnet_compute" id="Vnet_compute">
+		<result property="compute_id" column="compute_id" />
+		<result property="compute_addr" column="compute_addr" />
+		<result property="compute_name" column="compute_name" />
+		<result property="compute_ram" column="compute_ram" />
+		<result property="compute_cpu" column="compute_cpu" />
+	</resultMap>
+
+	<select id="getAll" resultClass="Vnet_compute">
+		select * from vnet_compute
+	</select>
+	
+	<select id="getById" resultClass="Vnet_compute" parameterClass="Integer">
+		select *
+		from vnet_compute
+		where compute_id=#compute_id#
+	</select>
+	
+	<insert id="insertCompute" parameterClass="Vnet_compute">
+		insert into
+		vnet_compute(compute_id,compute_addr,compute_name,compute_ram,compute_cpu)
+		values(#compute_id#,#compute_addr#,#compute_name#,#compute_ram#,#compute_cpu#)
+	</insert>
+	
+	
+	<select id="getByHostId" resultClass="Vnet_compute" parameterClass="String">
+		select vnet_compute.* from
+			( select * from sdn.vnet_compute_host
+			where vnet_compute_host.host_id=#host_id#) as A
+			inner join sdn.vnet_compute
+			on A.compute_id=vnet_compute.compute_id
+	</select>
+	
+	<select id="getByConId" resultClass="Vnet_compute" parameterClass="String">
+		select vnet_compute.* from
+			( select * from sdn.vnet_compute_controller
+			where sdn.vnet_compute_controller.controller_id=#con_id#) as A
+			inner join sdn.vnet_compute
+			on A.compute_id=vnet_compute.compute_id
+	</select>
+	
+	<select id="getBySwitchId" resultClass="Vnet_compute" parameterClass="String">
+		select vnet_compute.* from
+			( select * from sdn.vnet_compute_switch
+			where vnet_compute_switch.switch_id=#switch_id#) as A
+			inner join sdn.vnet_compute
+			on A.compute_id=vnet_compute.compute_id
+	</select>
+	
+	<delete id="delById" parameterClass="Integer">
+		delete from vnet_compute
+		where
+		compute_id=#compute_id#
+	</delete>
+	
+    <select id="getByComputer_name" resultClass="Vnet_compute" parameterClass="String">
+		select *
+		from vnet_compute
+		where compute_name=#compute_name#
+	</select>
+	
+</sqlMap>

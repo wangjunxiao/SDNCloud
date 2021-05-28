@@ -1,0 +1,19 @@
+2015/12/10:
+1、修改文件“Link.as",具体修改如下：
+	 （1）注销关于数据包显示的相关变量（line 46-51);
+	 （2）注销关于数据包显示的先关功能函数（line 53-67、line 140-221）；
+	 （3）注销了其他位置调用数据包显示相关功能的函数（SDNOVXDemo.mxml : line 354 和 line 351),
+	     OVXSDN.mxml ： line 164 和 line 171）;
+
+2、增加了通过dp_id获取端口统计数据的方法（PortStatsDaoImpl.java : line 27~41);
+
+3、修改数据表 s_port_stats：
+	（1）去掉了switch_id列，增加了 dp_id列
+	（2）将 update_time 类型由 date 类型改为 datetime类型
+	（3）修改了s_port_stats.xml文件中根据dp_id查询数据的MySQL查询语句
+	
+4、取消了每次更新数据删除 s_port_stats 操作（DelByCtrlIdServiceImpl.java : line 39)
+
+5、双击交换机弹出菜单中增加“端口数据”选项
+
+6、在view包下增加文件：PortStats.mxml

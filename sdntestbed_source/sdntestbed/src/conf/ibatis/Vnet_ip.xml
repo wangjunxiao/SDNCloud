@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Vnet_ip">
+
+	<typeAlias alias="Vnet_ip" type="cn.dlut.entity.Vnet_ip" />
+
+	<resultMap class="Vnet_ip" id="Vnet_ip">
+		<result property="ip_id" column="ip_id" />
+		<result property="ip_net" column="ip_net" />
+		<result property="ip_addr" column="ip_addr" />
+		<result property="ip_status" column="ip_status" />
+	</resultMap>
+
+	<select id="getAll" resultClass="Vnet_ip">
+		select * from vnet_ip
+	</select>
+	
+	<select id="getById" resultClass="Vnet_ip" parameterClass="Integer">
+		select *
+		from vnet_ip
+		where ip_id=#ip_id#
+	</select>
+	
+	<update id="updateByIpAddr" parameterClass="Vnet_ip">
+	
+		update 
+		vnet_ip
+		set ip_status=#ip_status#
+		where ip_addr=#ip_addr#
+	</update>
+	
+	<insert id="insertIp" parameterClass="Vnet_ip">
+		insert into
+		vnet_ip(ip_net,ip_addr,ip_status)
+		values(#ip_net#,#ip_addr#,#ip_status#)
+	</insert>
+	
+	<update id="updateIp" parameterClass="Vnet_ip">
+		update vnet_ip
+		SET ip_status=#ip_status#
+		where ip_addr=#ip_addr#		
+	</update>
+	
+	
+	<delete id="delById" parameterClass="Integer">
+		delete FROM vnet_ip where ip_id=#ip_id#
+		
+	</delete>
+	
+	<delete id="delByAddr" parameterClass="String">
+		delete FROM vnet_ip where ip_addr=#ip_addr#
+		
+	</delete>
+	
+	<select id="getByAddr" resultClass="Vnet_ip" parameterClass="String">
+		select *
+		from vnet_ip
+		where ip_addr=#ip_addr#
+	</select>
+	
+	<update id="updateByIpID" parameterClass="Vnet_ip">
+		update 
+		vnet_ip
+		set ip_status=#ip_status#
+		where ip_id=#ip_id#
+	</update>
+	
+	<select id="getInstanceIP" resultClass="String" parameterClass="String">
+         select vnet_ip.ip_addr
+         from vnet_instance_osport,vnet_osport,vnet_ip
+         where vnet_instance_osport.instance_id=#instance_id#
+         and vnet_instance_osport.osport_id=vnet_osport.osport_id
+         and vnet_osport.ip_id=vnet_ip.ip_id
+	</select>
+	
+</sqlMap>

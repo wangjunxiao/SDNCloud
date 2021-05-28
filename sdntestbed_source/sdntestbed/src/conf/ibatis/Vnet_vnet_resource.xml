@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Vnet_vnet_resource">
+
+	<typeAlias alias="Vnet_vnet_resource" type="cn.dlut.entity.Vnet_vnet_resource" />
+
+	<resultMap class="Vnet_vnet_resource" id="Vnet_vnet_resource">
+		<result property="vnet_resource_id" column="vnet_resource_id" />
+		<result property="vnet_id" column="vnet_id" />
+		<result property="resource_id" column="resource_id" />
+		<result property="resource_type" column="resource_type" />
+		<result property="resource_status" column="resource_status"/>
+		<result property="resource_timestamp" column="resource_timestamp"/>
+
+	</resultMap>
+
+	<select id="getAll" resultClass="Vnet_vnet_resource">
+		select * from vnet_vnet_resource
+	</select>
+	
+	
+	<select id="getOflinkByVnet" resultClass="String" parameterClass="String" >
+		select resource_id
+		from vnet_vnet_resource 
+		where vnet_id=#vnet_id#
+		and resource_type='oflink'
+		and resource_status='wait'
+	</select>
+	<select id="getLinkByVnet" resultClass="String" parameterClass="String" >
+		select resource_id
+		from vnet_vnet_resource 
+		where vnet_id=#vnet_id#
+		and resource_type='link'
+		and resource_status='wait'
+	</select>	
+	<select id="getSwitchByVnet" resultClass="String" parameterClass="String" >
+		select resource_id
+		from vnet_vnet_resource 
+		where vnet_id=#vnet_id#
+		and resource_type='Switch'
+		and resource_status='wait'
+	</select>
+	<select id="getControllerByVnet" resultClass="String" parameterClass="String" >
+		select resource_id
+		from vnet_vnet_resource 
+		where vnet_id=#vnet_id#
+		and resource_type='Controller'
+		and resource_status='wait'
+	</select>	
+	<select id="getHostByVnet" resultClass="String" parameterClass="String" >
+		select resource_id
+		from vnet_vnet_resource 
+		where vnet_id=#vnet_id#
+		and resource_type='Host'
+		and resource_status='wait'
+	</select>	
+	
+	<select id="getById" resultClass="Vnet_vnet_resource" parameterClass="Integer" >
+		select * 
+		from vnet_vnet_resource 
+		where vnet_resource_id=#vnet_resource_id#
+	</select>
+	
+	<insert id="insertVnetResource" parameterClass="Vnet_vnet_resource">
+		insert into
+		vnet_vnet_resource(
+		vnet_id,resource_id,resource_type,resource_status)
+		values(#vnet_id#,#resource_id#,#resource_type#,#resource_status#)
+	</insert>
+	
+	<delete id="delById" parameterClass="Integer">
+		delete 
+		from vnet_vnet_resource 
+		where vnet_resource_id=#vnet_resource_id#	
+	</delete>
+	
+	<update id="setDeleted" parameterClass="String">
+		update vnet_vnet_resource
+		set resource_status='DELETED'
+		where resource_id=#resource_id#
+	</update>
+	
+	
+</sqlMap>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Vnet_switch">
+
+	<typeAlias alias="Vnet_switch" type="cn.dlut.entity.Vnet_switch" />
+
+	<resultMap class="Vnet_switch" id="Vnet_switch">
+		<result property="switch_id" column="switch_id" />
+		<result property="switch_name" column="switch_name" />
+		<result property="switch_counter" column="switch_counter" />
+		<result property="switch_status" column="switch_status" />
+	</resultMap>
+
+	<select id="getAll" resultClass="Vnet_switch">
+		select * from vnet_switch
+	</select>
+	
+	<select id="getAllbyStatus" resultClass="Vnet_switch" parameterClass="Integer">
+		select sdn.vnet_switch.* from
+		(select sdn.vnet_vnet_resource.* from
+		(select * from sdn.vnet_executor_vnet
+		where sdn.vnet_executor_vnet.executor_id=#exe_id#) as A inner join sdn.vnet_vnet_resource
+		on A.vnet_id=sdn.vnet_vnet_resource.vnet_id and sdn.vnet_vnet_resource.resource_status='wait'
+		and sdn.vnet_vnet_resource.resource_type='Switch') as B inner join sdn.vnet_switch
+		on B.resource_id=sdn.vnet_switch.switch_id
+		and sdn.vnet_switch.switch_status='ACTIVE'
+	</select>
+	
+	<select id="getById" resultClass="Vnet_switch" parameterClass="String">
+		select *
+		from vnet_switch
+		where switch_id=#switch_id#
+	</select>
+	
+	<insert id="insertSwitch" parameterClass="Vnet_switch">
+		insert into
+		vnet_switch(switch_id,switch_name)
+		values(#switch_id#,#switch_name#)
+	</insert>
+	
+	
+	<update id="updateSwitch" parameterClass="Vnet_switch">
+		update vnet_switch
+		set switch_name=#switch_name#,
+		switch_counter=#switch_counter#,
+		switch_status=#switch_status#
+		where switch_id=#switch_id#
+	</update>
+	
+	<delete id="delById" parameterClass="String">
+		delete FROM vnet_switch where switch_id=#switch_id#
+	</delete>
+	
+</sqlMap>

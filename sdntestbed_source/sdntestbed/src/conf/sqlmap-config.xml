@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE sqlMapConfig
+	PUBLIC "-//ibatis.apache.org//DTD sql Map Config 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-config-2.dtd">
+<sqlMapConfig>
+	<settings cacheModelsEnabled="false"
+			  enhancementEnabled="false"
+			  lazyLoadingEnabled="false"
+			  errorTracingEnabled="true"
+			  maxRequests="32"
+			  maxSessions="10" 
+			  maxTransactions="5" 
+			  useStatementNamespaces="true" />
+	
+	
+	<sqlMap resource="ibatis/Vnet_instance.xml" />	
+	<sqlMap resource="ibatis/Vnet_flavor.xml" />
+	<sqlMap resource="ibatis/Vnet_image.xml" />		
+	<sqlMap resource="ibatis/Vnet_image_instance.xml" />
+	<sqlMap resource="ibatis/Vnet_request.xml" />	
+	<sqlMap resource="ibatis/Vnet_ip.xml" />	
+	<sqlMap resource="ibatis/Vnet_switch.xml" />	
+	<sqlMap resource="ibatis/Vnet_host.xml"/>
+	<sqlMap resource="ibatis/Vnet_osport.xml"/>
+	<sqlMap resource="ibatis/Vnet_ofport.xml"/>
+	<sqlMap resource="ibatis/Vnet_instance_controller.xml"/>
+	<sqlMap resource="ibatis/Vnet_floatingip.xml"/>
+	<sqlMap resource="ibatis/Vnet_vnet.xml"/>
+	<sqlMap resource="ibatis/Vnet_executor.xml"/>
+	<sqlMap resource="ibatis/Vnet_controller.xml"/>
+	<sqlMap resource="ibatis/Vnet_instance_host.xml" />
+	<sqlMap resource="ibatis/Vnet_compute.xml" />
+	<sqlMap resource="ibatis/Vnet_oflink.xml"/>
+	<sqlMap resource="ibatis/Vnet_executor_vnet.xml"/>
+	<sqlMap resource="ibatis/Vnet_link.xml" />
+    <sqlMap resource="ibatis/Vnet_compute_instance.xml" />
+    <sqlMap resource="ibatis/Vnet_compute_switch.xml" />
+	<sqlMap resource="ibatis/Vnet_compute_tunofport.xml" />
+	<sqlMap resource="ibatis/Vnet_tunofport.xml" />
+	<sqlMap resource="ibatis/Vnet_tun.xml" />
+	<sqlMap resource="ibatis/Vnet_switch_ofport.xml" />	
+	<sqlMap resource="ibatis/Vnet_stack.xml" />	
+	<sqlMap resource="ibatis/Vnet_stack_instance.xml" />	
+
+	<sqlMap resource="ibatis/Vnet_flavor_instance.xml"/>
+	<sqlMap resource="ibatis/Vnet_vnet_resource.xml"/>
+	<sqlMap resource="ibatis/Vnet_instance_osport.xml"/>
+
+	
+	<sqlMap resource="ibatis/Vnet_compute_host.xml"/>
+	<sqlMap resource="ibatis/Vnet_compute_controller.xml"/>
+
+	
+	<sqlMap resource="ibatis/Vnet_usersubnet_userip.xml"/>
+	<sqlMap resource="ibatis/Vnet_vnet_userscript.xml"/>
+	<sqlMap resource="ibatis/Vnet_vnet_usersubnet.xml"/>
+	<sqlMap resource="ibatis/Vnet_subnet.xml"/>
+	<sqlMap resource="ibatis/Vnet_script.xml"/>
+    <sqlMap resource="ibatis/Vnet_userip.xml"/>
+
+
+</sqlMapConfig>

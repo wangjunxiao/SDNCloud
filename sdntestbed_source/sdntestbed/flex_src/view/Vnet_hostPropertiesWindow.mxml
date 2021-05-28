@@ -1,0 +1,464 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark"    
+			   xmlns:mx="library://ns.adobe.com/flex/mx" width="344" height="330" initialize="init()"
+			   close="PopUpManager.removePopUp(this)" backgroundColor="#F2EBEB" dropShadowVisible="true" borderVisible="true" borderColor="#CEBCBC">
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	
+	<fx:Declarations>
+		<s:RemoteObject id="Vnet_JavaToFlexService" destination="Vnet_JavaToFlexService" >
+			<s:method name="usersubnet_JavaToFlex" fault="faultHandler(event)" result="usersubnetJavaToFlex_resultHandler(event)"/>
+		</s:RemoteObject>
+		
+		<mx:RemoteObject id="Vnet_UserResourceService" destination="Vnet_UserResourceService" >
+			<mx:method name="userip_FlexToJava" fault="faultHandler(event)" result="userip_FlexToJava_resultHandler(event)"/>	
+			<mx:method name="usersubnet_ipFlexToJava" fault="faultHandler(event)" result="usersubnet_ipFlexToJava_resultHandler(event)"/>	
+		</mx:RemoteObject>
+		
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import Components.Host;
+			
+			import mx.collections.ArrayCollection;
+			import mx.collections.XMLListCollection;
+			import mx.controls.Alert;
+			import mx.core.FlexGlobals;
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			import mx.rpc.xml.SimpleXMLEncoder;
+			
+			import spark.events.IndexChangeEvent;
+			
+			import vo.Vnet_image;
+			import vo.Vnet_userip;
+			import vo.Vnet_usersubnet_userip; 
+			
+			
+			private var selectimage:int = -1; 
+			private var selectflavor:int = -1;
+			private var selectsubnet:String;
+			private var user_subnet:String;
+			
+			private var counter:int = 0;
+			
+			private var image_change:Boolean = false;
+			private var flavor_change:Boolean = false;
+			private var subnet_change:Boolean = false;
+			private var image_has_changed = false;
+			private var flavor_has_changed = false;
+			private var checkselect:int = 0;
+			public var image_get:String = "";
+			public var flavor_get:String = "";
+			
+			[Bindable]
+			private var imageList:XMLListCollection = ACToXMLListCollection(FlexGlobals.topLevelApplication.vnet_images);
+			[Bindable]
+			private var flavorList:XMLListCollection = ACToXMLListCollection(FlexGlobals.topLevelApplication.vnet_flavors);
+			[Bindable]
+			private var subnetList:XMLListCollection;
+			
+			
+			protected function init():void{
+				Vnet_JavaToFlexService.usersubnet_JavaToFlex();
+			}
+			
+			protected function usersubnet_ipFlexToJava_resultHandler(event:ResultEvent):void{
+				counter++;
+				if(counter == 2){
+					counter--;
+					Alert.show("configuration is applied!","Success");
+					PopUpManager.removePopUp(this);
+				}
+			}
+			
+			protected function userip_FlexToJava_resultHandler(event:ResultEvent):void{
+				counter++;
+				if(counter == 2){
+					counter--;
+					Alert.show("configuration is applied!","Success");
+					PopUpManager.removePopUp(this);
+				}
+			}
+			
+			protected function usersubnetJavaToFlex_resultHandler(event:ResultEvent):void{
+				FlexGlobals.topLevelApplication.vnet_subnets = event.result as ArrayCollection;
+				subnetList = ACToXMLListCollection(FlexGlobals.topLevelApplication.vnet_subnets);
+			}
+			
+			protected function faultHandler(event:FaultEvent):void{        
+				Alert.show("Fault:"+event.fault.toString());
+				
+			}
+			
+			protected function is_apply():Boolean{
+				var result:Boolean = true;
+				if(FlexGlobals.topLevelApplication.activeItem.className == "Host"){
+					for(var i:int=0; i<FlexGlobals.topLevelApplication.vnet_hosts.length; i++){
+						if(FlexGlobals.topLevelApplication.vnet_hosts[i].host_id ==
+							Host(FlexGlobals.topLevelApplication.activeItem).getHost_ID()){
+							result = false;
+						}
+					}
+					
+				}
+				return result;
+			}
+			
+			protected function button1_clickHandler(event:MouseEvent):void
+			{
+//				Alert.show(image_get);
+//				Alert.show(flavor_get);
+				if(image_change || image_has_changed){
+					image_get = image.selectedItem.image_name;
+					image_change = false;
+				}
+				else{
+					image_get = showimage();
+					for(var i:int=0; i<imageList.length; i++){
+						if(imageList.getItemAt(i).image_name == image_get){
+							selectimage = imageList.getItemAt(i).image_id;
+						}
+					}
+				}
+				if(flavor_change || flavor_has_changed){
+					flavor_get = flavor.selectedItem.flavor_name;
+					flavor_change = false;
+				}
+				else{
+					flavor_get = showflavor();
+					for(var j:int=0; j<flavorList.length; j++){
+						if(flavorList.getItemAt(j).flavor_name == flavor_get){
+							selectflavor = flavorList.getItemAt(j).flavor_id;
+						}
+					}
+				}
+				if(image_get=="rhel-6.5-x86_64" && flavor_get!="m1.small" && flavor_get!="m1.medium" && flavor_get!="m1.large" && flavor_get!="m1.xlarge"){
+					Alert.show("The selected flavor specification is too small");
+				}
+				else if(image_get=="cirros-0.3.4-x86_64" && check.selected){
+					Alert.show("Selected mirrors do not support dual network cards");
+				}
+				else if((image_get == "tty" || image_get == "floodlight" || image_get == "ubuntu-plain" 
+						|| image_get == "ovs")
+						&& (flavor_get=="m1.micro" || flavor_get=="m1.nano"
+						|| flavor_get=="m1.little" || flavor_get=="m1.tiny")){
+					Alert.show("The selected flavor specification is too small");
+				}
+				else{
+					FlexGlobals.topLevelApplication.activeItem.setHost_Name(_name.text);
+					FlexGlobals.topLevelApplication.activeItem.setHost_Config(checkselect);
+					FlexGlobals.topLevelApplication.activeItem.setimage(selectimage);
+					FlexGlobals.topLevelApplication.activeItem.setflavor(selectflavor);
+					Alert.show("configuration is applied!","Success");
+//					Alert.show(image_get);
+//					Alert.show(flavor_get);
+					PopUpManager.removePopUp(this);
+				}
+			}
+			
+			protected function button2_clickHandler(event:MouseEvent):void
+			{
+				if(_userip.text != "" && !subnet_change){
+					Alert.show("Choose subnet firstly please");
+					return;
+				}
+				if(verify_UserIp()){
+					FlexGlobals.topLevelApplication.activeItem.setHost_IP(_userip.text);
+					var ip_id:String = "userip~" + (new Date()).toString() + FlexGlobals.topLevelApplication.executor_name;
+					var ip:Vnet_userip = new Vnet_userip(ip_id, _userip.text, 
+								subnet_mask.text,Host(FlexGlobals.topLevelApplication.activeItem).getHost_ID());
+					var subnet_ip:Vnet_usersubnet_userip = new Vnet_usersubnet_userip(selectsubnet, ip_id);
+					Vnet_UserResourceService.userip_FlexToJava(ip);
+					Vnet_UserResourceService.usersubnet_ipFlexToJava(subnet_ip);
+					FlexGlobals.topLevelApplication.activeItem.setHost_Name(_name.text);
+					if(flavor_change){
+						FlexGlobals.topLevelApplication.activeItem.setflavor(selectflavor);
+					}
+					else{
+						FlexGlobals.topLevelApplication.activeItem.setflavor(92);
+					}
+					if(image_change){
+						FlexGlobals.topLevelApplication.activeItem.setimage(selectimage);
+					}
+					else{
+						FlexGlobals.topLevelApplication.activeItem.setimage(1111114);
+					}
+					if(subnet_change){
+						FlexGlobals.topLevelApplication.activeItem.setHost_Subnet(selectsubnet);
+					}
+				}
+				else{
+					Alert.show("IP_Address is illegal!");
+				}
+			}
+			
+			
+			protected function verify_UserIp():Boolean{
+				var res:Boolean = false;
+				if(_userip.text == ""){
+					return true;
+				}
+				else{
+					if(verify_ipv4(_userip.text)){ 
+						var bi_subnet:String = Parse_BiString(user_subnet);
+						var bi_userip:String = Parse_BiString(_userip.text);
+						var bi_mask:String = Parse_BiString(subnet_mask.text);
+						var num:int = 0;
+						for(var i:int=0; i<bi_mask.length; i++){
+							if(bi_mask.charAt(i) == "1"){
+								num++;
+							}
+							else{
+								break;
+							}
+						}
+						if(bi_subnet.substring(0, num) == bi_userip.substring(0, num)){
+							res = true;
+						}
+					}
+				}
+				return res;
+			}
+			
+			
+			private function Parse_BiString(decimal:String):String{
+				var temp:Array = decimal.split(".");
+				var len:int;
+				for(var i:int=0; i<temp.length; i++){
+					temp[i] = parseInt(temp[i]).toString(2);
+					len = 8-temp[i].length;
+					for(var k:int=0; k<len; k++){
+						temp[i] = "0"+temp[i];
+					}
+				}
+				return temp[0] + temp[1] + temp[2] + temp[3];
+			}
+					
+			private function verify_ipv4(ipv4:String):Boolean{
+				var result:Boolean = false;
+				var temp:Array = ipv4.split(".");
+				if(temp.length == 4){
+					if(!isNaN(Number(temp[0])) && !isNaN(Number(temp[1])) && !isNaN(Number(temp[2])) && !isNaN(Number(temp[3])))
+						if(temp[0]!="" && -1<parseInt(temp[0]) && parseInt(temp[0])<256)  
+							if(temp[1]!="" && -1<parseInt(temp[1]) && parseInt(temp[0])<256)  
+								if(temp[2]!="" && -1<parseInt(temp[2]) && parseInt(temp[0])<256)  
+									if(temp[3]!="" && -1<parseInt(temp[3]) && parseInt(temp[0])<256)  
+										result = true; 
+				}
+				return result;
+			}
+			
+			protected function image_changeHandler(event:IndexChangeEvent):void  
+			{  
+				if(is_apply()){
+					image_change = true;
+					image_has_changed = true;
+					image_get = image.selectedItem.image_name;
+					myString.text = "name: " + image.selectedItem.image_name + "\n"
+						+ "format: " + image.selectedItem.image_format + "\n"
+						+	"size: " + image.selectedItem.image_size;
+					selectimage = image.selectedItem.image_id;
+				}
+			}  
+			
+			protected function flavor_changeHandler(event:IndexChangeEvent):void  
+			{  
+				if(is_apply()){
+					flavor_change = true;
+					flavor_has_changed = true;
+					flavor_get = flavor.selectedItem.flavor_name;
+					myString.text = "name: " + flavor.selectedItem.flavor_name + "\n"
+						+ "vcpus: " + flavor.selectedItem.flavor_vcpus + "\n"
+						+	"ram: " + flavor.selectedItem.flavor_ram + "\n"
+						+ "rootdisk: " + flavor.selectedItem.flavor_vcpus + "\n"
+						+ "ephemeraldisk: " + flavor.selectedItem.flavor_ephemeraldisk + "\n"
+						+ "swapdisk: " + flavor.selectedItem.flavor_swapdisk; 
+					selectflavor = flavor.selectedItem.flavor_id;
+				}
+			}
+			
+			protected function subnet_changeHandler(event:IndexChangeEvent):void  
+			{
+				subnet_change = true;
+				subnet_mask.text = subnet.selectedItem.usersubnet_mask;
+				myString2.text = "name: " + subnet.selectedItem.usersubnet_name + "\n"
+					+ "type: " + subnet.selectedItem.usersubnet_type + "\n"
+					+	"addr: " + subnet.selectedItem.usersubnet_addr + "\n"
+					+ "mask: " + subnet.selectedItem.usersubnet_mask; 
+				user_subnet = subnet.selectedItem.usersubnet_addr;
+				selectsubnet = subnet.selectedItem.usersubnet_id;
+			}
+			
+			protected function showimage():String{
+				var image_id:int = FlexGlobals.topLevelApplication.activeItem.getimage();
+				var image:String;
+				if(image_id == -1){
+					image_get = "cirros-0.3.4-x86_64";
+					for(var j:int=0; j<imageList.length; j++){
+						if(imageList.getItemAt(j).image_name == "cirros-0.3.4-x86_64"){
+							image_id = imageList.getItemAt(j).image_id;
+							break;
+						}
+					}
+				}
+				for(var i:int=0; i<imageList.length; i++){
+					if(imageList.getItemAt(i).image_id == image_id){
+						image = imageList.getItemAt(i).image_name;
+						break;
+					}
+				}
+				return image;
+			}
+			
+			public function hostconfig():Boolean{
+				var res:Boolean = false;
+				var hostconfig:int = FlexGlobals.topLevelApplication.activeItem.getHost_Config();
+//				Alert.show(hostconfig + "");
+				if (hostconfig == 1){
+					res = true;
+				}
+				return res;
+			}
+			
+			protected function showflavor():String{
+				var flavor_id:int = FlexGlobals.topLevelApplication.activeItem.getflavor();
+				var flavor:String;
+				if(flavor_id == -1){
+					flavor_get = "m1.nano";
+					for(var j:int=0; j<flavorList.length; j++){
+						if(flavorList.getItemAt(j).flavor_name == "m1.nano"){
+							flavor_id = flavorList.getItemAt(j).flavor_id;
+							break;
+						}
+					}
+				}
+				for(var i:int=0; i<flavorList.length; i++){
+					if(flavorList.getItemAt(i).flavor_id == flavor_id){
+						flavor = flavorList.getItemAt(i).flavor_name;
+						break;
+					}
+				}
+				return flavor;
+			}
+			
+			protected function showsubnet():String{
+				if(FlexGlobals.topLevelApplication.activeItem.getHost_Subnet() == null){
+					return "";
+				}
+				else if(FlexGlobals.topLevelApplication.activeItem.getHost_Subnet() != ""){
+					var subnet_id:String = FlexGlobals.topLevelApplication.activeItem.getHost_Subnet();
+					for(var i:int=0; i<subnetList.length; i++){
+						if(subnetList.getItemAt(i).usersubnet_id == subnet_id){
+							user_subnet = subnetList.getItemAt(i).usersubnet_addr;
+							return user_subnet;
+						}
+					}
+				}
+				return "";
+			}
+			
+			protected function showmask():String{
+				if(FlexGlobals.topLevelApplication.activeItem.getHost_Subnet() == null){
+					return "";
+				}
+				else if(FlexGlobals.topLevelApplication.activeItem.getHost_Subnet() != ""){
+					var subnet_id:String = FlexGlobals.topLevelApplication.activeItem.getHost_Subnet();
+					for(var i:int=0; i<subnetList.length; i++){
+						if(subnetList.getItemAt(i).usersubnet_id == subnet_id){
+							return subnetList.getItemAt(i).usersubnet_mask;
+						}
+					}
+				}
+				return "";
+			}
+			
+			private function ACToXMLListCollection(ac:ArrayCollection):XMLListCollection{
+				var xmlList:XMLListCollection = new XMLListCollection();
+				var xml:XML;
+				for(var i:int=0; i<ac.length; i++){
+					xml = ObjectToXML(ac[i]);
+					xmlList.addItem(xml);
+				}
+				return xmlList;
+			}
+			
+			private function ObjectToXML(obj:Object):XML {
+				var qName:QName = new QName("image");
+				var xmlDocument:XMLDocument = new XMLDocument();
+				var simpleXMLEncoder:SimpleXMLEncoder = new SimpleXMLEncoder(xmlDocument);
+				var xmlNode:XMLNode = simpleXMLEncoder.encodeValue(obj, qName, xmlDocument);
+				var xml:XML = new XML(xmlDocument.toString());
+				return xml;
+			}
+			
+			
+
+			protected function check_clickHandler(event:MouseEvent):void
+			{
+				if(is_apply()){
+					if(check.selected){
+						Alert.show("selected");
+						checkselect = 1;
+					}else{
+						Alert.show("unselected");
+						checkselect = 0;
+					}
+				}
+			}
+			
+			protected function showconfig():Boolean {
+				return false;
+			}
+
+		]]>
+	</fx:Script>
+	
+	<mx:TabNavigator y="5.5" width="329" height="287"  horizontalCenter="-1" backgroundColor="#ECDFDF">
+		<s:NavigatorContent label="Configuration" width="100%" height="100%" backgroundColor="#E8DDDD">	
+			<s:Button x="7" y="-2" label="Configuration" height="22" width="313"/>
+			<s:VGroup x="17" y="36" width="113" height="180" gap="19" horizontalAlign="right" paddingTop="10">
+				<s:Label text="Title" height="9"/>
+				<s:Label text="IP Address" height="9"/>
+				<s:Label text="Hostname" height="9"/>
+				<s:Label text="Image" height="9"/>
+				<s:Label text="Flavor" height="9"/>
+				<s:Label text="Config" height="15"/>
+			</s:VGroup>
+			<s:VGroup x="166" y="35" width="166" gap="18" horizontalAlign="left" paddingTop="10">
+				<s:Label text="{FlexGlobals.topLevelApplication.activeItem.title}"/>
+				<s:Label text="{FlexGlobals.topLevelApplication.activeItem.getHost_IP()}"/>
+			</s:VGroup>
+			<s:VGroup x="166" y="86" gap="7" horizontalAlign="left" paddingTop="10">
+				<s:TextInput text="{FlexGlobals.topLevelApplication.activeItem.getName()}" id="_name"/>
+				<s:DropDownList id="image" dataProvider="{imageList}" prompt="{showimage()}" labelField="image_name" change="image_changeHandler(event)" width="129"/>
+				<s:DropDownList id="flavor" dataProvider="{flavorList}" prompt="{showflavor()}" labelField="flavor_name" change="flavor_changeHandler(event)" width="129"/>
+			</s:VGroup>
+			<mx:CheckBox id="check" x="167" click="check_clickHandler(event)"  y="181" enabled="{is_apply()}" selected="{hostconfig()}"/>
+			<s:Button x="121" y="216" label="Apply" width="100" click="button1_clickHandler(event)" enabled="{is_apply()}"/>
+			<s:Label id="myString" x="400" y="94" fontSize="30"/>
+			<s:Label x="189" y="185" text="{FlexGlobals.topLevelApplication.activeItem.floating_ip}" width="107" height="17"/>
+		</s:NavigatorContent>
+		<s:NavigatorContent label="IP Management" width="100%" height="100%" backgroundColor="#E8DDDD">	
+			<s:Button x="7" y="-2" label="IP Management" height="22" width="313"/>
+			<s:VGroup x="18" y="45" width="113" height="152" gap="30" horizontalAlign="right" paddingTop="10">
+				<s:Label text="Subnet" height="15"/>
+				<s:Label text="Netmask" height="15"/>
+				<s:Label text="IP Address" height="15"/>
+			</s:VGroup>
+			<s:VGroup x="166" y="40" width="166" height="152" gap="30" horizontalAlign="left" paddingTop="10">
+				<s:DropDownList id="subnet" dataProvider="{subnetList}" prompt="{showsubnet()}" labelField="usersubnet_addr" change="subnet_changeHandler(event)" width="129"/>
+				<s:Label id="subnet_mask" text="{showmask()}"/>
+			</s:VGroup>
+			<s:TextInput x="166" y="139" id="_userip" text="{FlexGlobals.topLevelApplication.activeItem.getHost_IP()}"/>
+			<s:Button x="121" y="210" label="Apply" width="100" click="button2_clickHandler(event)" enabled="false"/>
+			<s:Label id="myString2" x="400" y="94" fontSize="30"/>
+		</s:NavigatorContent>
+		<s:NavigatorContent label="more.." width="100%" height="100%"/>
+	</mx:TabNavigator>
+</s:TitleWindow>

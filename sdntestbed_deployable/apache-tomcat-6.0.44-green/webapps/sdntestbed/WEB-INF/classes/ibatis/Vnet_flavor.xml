@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Vnet_flavor">
+
+	<typeAlias alias="Vnet_flavor" type="cn.dlut.entity.Vnet_flavor" />
+
+	<resultMap class="Vnet_flavor" id="Vnet_flavor">
+		<result property="flavor_id" column="flavor_id" />
+		<result property="flavor_osid" column="flavor_osid" />
+		<result property="flavor_name" column="flavor_name" />
+		<result property="flavor_vcpus" column="flavor_vcpus" />
+		<result property="flavor_ram" column="flavor_ram" />
+		<result property="flavor_rootdisk" column="flavor_rootdisk" />
+		<result property="flavor_ephemeraldisk" column="flavor_ephemeraldisk" />
+		<result property="flavor_swapdisk" column="flavor_swapdisk" />
+	</resultMap>
+
+	<select id="getAll" resultClass="Vnet_flavor">
+		select * from vnet_flavor
+	</select>
+	
+	<select id="getById" resultClass="Vnet_flavor" parameterClass="Integer" >
+		select * from vnet_flavor where flavor_id=#flavor_id#
+	</select>
+	
+	<insert id="insertFlavor" parameterClass="Vnet_flavor">
+		insert into
+		vnet_flavor(flavor_osid,flavor_name,flavor_vcpus,flavor_ram,flavor_rootdisk,flavor_ephemeraldisk,flavor_swapdisk)
+		values(#flavor_osid#,#flavor_name#,#flavor_vcpus#,#flavor_ram#,#flavor_rootdisk#,#flavor_ephemeraldisk#,#flavor_swapdisk#)
+	</insert>
+	
+	<delete id="delById" parameterClass="Integer">
+		delete from vnet_flavor where flavor_id=#flavor_id#	
+	</delete>
+	
+
+	<select id="getOsid" resultClass="Vnet_flavor" parameterClass="Integer">
+		select *
+		from vnet_flavor 
+		where flavor_id=#flavor_id#
+	</select>
+	
+
+	<delete id="delAll"  >
+		delete  from vnet_flavor 	
+	</delete>
+
+</sqlMap>

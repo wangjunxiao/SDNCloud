@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Vnet_instance_controller">
+
+	<typeAlias alias="Vnet_instance_controller" type="cn.dlut.entity.Vnet_instance_controller" />
+
+	<resultMap class="Vnet_instance_controller" id="Vnet_instance_controller">
+		<result property="instance_controller_id" column="instance_controller_id" />
+		<result property="instance_id" column="instance_id" />
+		<result property="controller_id" column="controller_id" />
+	</resultMap>
+
+	<select id="getAll" resultClass="Vnet_instance_controller">
+		select * from Vnet_instance_controller
+	</select>
+	
+	<select id="getAllActive" resultClass="Vnet_instance_controller" parameterClass="Integer">
+		select sdn.vnet_instance_controller.* from
+		(select sdn.vnet_vnet_resource.* from
+		(select * from sdn.vnet_executor_vnet
+		where sdn.vnet_executor_vnet.executor_id=#exe_id#) as A inner join sdn.vnet_vnet_resource
+		on A.vnet_id=sdn.vnet_vnet_resource.vnet_id and sdn.vnet_vnet_resource.resource_status='wait'
+		and sdn.vnet_vnet_resource.resource_type='Controller') as B inner join sdn.vnet_instance_controller
+		on B.resource_id=sdn.vnet_instance_controller.controller_id
+	</select>
+	
+	<select id="getById" resultClass="Vnet_instance_controller" parameterClass="Integer">
+		select *
+		from Vnet_instance_controller
+		where instance_controller_id=#instance_controller_id#
+	</select>
+	
+	<select id="getController_id" resultClass="Vnet_instance_controller" parameterClass="String" >
+		select * 
+		from vnet_instance_controller
+		where instance_id=#instance_id#
+	</select>
+	
+	<insert id="insertInstance_controller" parameterClass="Vnet_instance_controller">
+		insert into
+		Vnet_instance_controller(instance_id,controller_id)
+		values(#instance_id#,#controller_id#)
+	</insert>
+	
+	<select id="getInstance_id" parameterClass="String" resultClass="Vnet_instance_controller" >
+		select *
+		from vnet_instance_controller
+		where controller_id=#controller_id#
+	
+	</select>
+	
+	
+	<delete id="delById" parameterClass="Vnet_instance_controller">
+		delete FROM Vnet_instance_controller where instance_controller_id=#instance_controller_id#
+		
+	</delete>
+	
+	
+</sqlMap>

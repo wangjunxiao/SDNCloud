@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Vnet_stack">
+
+	<typeAlias alias="Vnet_stack" type="cn.dlut.entity.Vnet_stack" />
+
+	<resultMap class="Vnet_stack" id="Vnet_stack">
+		<result property="stack_id" column="stack_id" />
+		<result property="stack_osid" column="stack_osid" />
+		<result property="stack_name" column="stack_name" />
+		<result property="stack_type" column="stack_type" />
+		<result property="stack_status" column="stack_status" />
+	</resultMap>
+
+	<select id="getAll" resultClass="Vnet_stack">
+		select * from vnet_stack
+	</select>
+	<select id="getById" resultClass="Vnet_stack" parameterClass="Integer">
+		select *
+		from vnet_stack
+		where stack_id=#stack_id#
+	</select>
+	
+	<insert id="insertStack" parameterClass="Vnet_stack">
+		insert into
+		vnet_stack(stack_id,stack_osid,stack_name,stack_type,stack_status)
+		values(#stack_id#,#stack_osid#,#stack_name#,#stack_type#,#stack_status#)
+	</insert>
+	
+	<insert id="insertAndGetId" parameterClass="Vnet_stack" >  
+		insert into
+		vnet_stack(stack_name)
+		values(#stack_name#)
+		<selectKey resultClass="int" keyProperty="stack_id" >
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		
+	</insert>
+	
+	<update id="updateStack" parameterClass="Vnet_stack">
+		update vnet_stack
+		set stack_osid=#stack_osid#,
+		stack_name=#stack_name#,
+		stack_type=#stack_type#,
+		stack_status=#stack_status#
+		where stack_id=#stack_id#
+		
+	</update>
+	
+	<select id="getByHostId" resultClass="Vnet_stack" parameterClass="String">
+		select vnet_stack.* from
+		    (select vnet_stack_instance.* from
+		        (select * from sdn.vnet_instance_host
+		        where host_id=#host_id#) as A 
+		    inner join sdn.vnet_stack_instance
+		    on A.instance_id=vnet_stack_instance.instance_id) as  B
+		inner join sdn.vnet_stack
+		on B.stack_id=vnet_stack.stack_id;
+	</select>
+	
+	<select id="getByConId" resultClass="Vnet_stack" parameterClass="String">
+		select vnet_stack.* from
+		    (select vnet_stack_instance.* from
+		        (select * from vnet_instance_controller
+		        where vnet_instance_controller.controller_id=#con_id#) as A 
+		    inner join sdn.vnet_stack_instance
+		    on A.instance_id=vnet_stack_instance.instance_id) as  B
+		inner join sdn.vnet_stack
+		on B.stack_id=vnet_stack.stack_id;
+	</select>
+	
+	
+	<delete id="delById" parameterClass="String">
+		delete FROM vnet_stack where stack_id=#stack_id#
+		
+	</delete>
+	
+</sqlMap>

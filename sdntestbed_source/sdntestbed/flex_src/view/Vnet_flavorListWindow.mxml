@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<utils:MyTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					 xmlns:s="library://ns.adobe.com/flex/spark" 
+					 xmlns:mx="library://ns.adobe.com/flex/mx"
+					 xmlns:utils="utils.*"
+					 xmlns:cdg="view.*"
+					 layout="vertical"
+					 initialize="init1()" width="850" height="600" 
+					 close="this.parent.removeChild(this)" showCloseButton="true"
+					 verticalScrollPolicy="auto" horizontalScrollPolicy="auto" dropShadowVisible="true">
+	
+	<fx:Declarations>		
+		<s:RemoteObject id="Vnet_ShowflavorService" destination="Vnet_ShowflavorService" >  
+			<s:method name="queryFlavor" result="queryflavorResultHandler(event)" fault = "faultHandler(event)"/>
+		</s:RemoteObject>	
+	</fx:Declarations>
+	
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.collections.ArrayList;
+			import mx.controls.Alert;
+			import mx.core.FlexGlobals;
+			import mx.managers.PopUpManager;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			
+			import spark.events.IndexChangeEvent;
+			
+			import utils.KeepOnly;
+			
+			[Bindable]
+			private var filter_attr:ArrayCollection = new ArrayCollection(["All"]);			
+			[Bindable]
+			private var filter_valuelist:ArrayCollection = new ArrayCollection();
+			[Bindable]
+			private var list_ac:ArrayCollection=new ArrayCollection();
+			[Bindable]
+			private var filterlist:ArrayCollection=new ArrayCollection();
+			
+			
+			protected function init1():void{
+				Vnet_ShowflavorService.queryFlavor();
+				this.title = "Flavor List";
+			}
+			
+			private function queryflavorResultHandler(event:ResultEvent):void{
+				list_ac = event.result as ArrayCollection;
+				this.addEventListener(Event.RESIZE, titleWindowResized);
+				getdata_all();
+				listDG.InitData(filterlist);
+			}
+			
+			private function faultHandler(event:FaultEvent):void{
+				Alert.show(event+"");
+			}
+			
+			
+			
+			protected function titleWindowResized(event:Event):void{
+				
+				this.addEventListener(MouseEvent.MOUSE_UP, resizeCompleted);
+			}
+			
+			protected function resizeCompleted(event:MouseEvent):void{
+				
+				this.removeEventListener(MouseEvent.MOUSE_UP, resizeCompleted);
+			}
+			
+			
+			
+		]]>
+	</fx:Script>
+	
+	
+	<fx:Script>
+		<![CDATA[
+			
+			public function getdata_all():void{
+				if(filterlist.length!=0)
+					filterlist.removeAll();
+				for(var num:int = 0;num<list_ac.length;num++){
+					filterlist.addItem(list_ac[num]);
+				}
+			}
+		
+			
+		
+			private function filterHandler(filter_attri:String):void{
+				if(filterlist.length!=0)
+					filterlist.removeAll();
+				switch(filter_attri){
+					case "All":
+						getdata_all();
+						break;
+					}
+				listDG.InitData(filterlist);
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Script>
+		<![CDATA[
+			
+			private function filter_attri_valueCommitHandler():void{
+				var filter_attri:String=filter_attri.selectedItem;
+				var num:int;
+				if(filter_valuelist.length!=0)
+					filter_valuelist.removeAll();
+				switch(filter_attri){
+					case "All":
+						filter_value.dataProvider=filter_valuelist;
+						break;
+				}				
+			}
+			
+		]]>
+	</fx:Script>
+	
+	
+	<s:Spacer height="5"/>
+	
+	<s:Group>
+		<s:layout>
+			<s:HorizontalLayout/>
+		</s:layout>
+		
+		<s:DropDownList id="filter_attri" dataProvider="{filter_attr}" 
+						selectedItem="{filter_attr.getItemAt(0)}" valueCommit="filter_attri_valueCommitHandler()"/>
+		<s:DropDownList id="filter_value" width="200"/>
+		<s:Button id="filter" label="filter" fontWeight="bold" 
+				  click="filterHandler(filter_attri.selectedItem.toString())"/>
+		<s:Spacer width="20"/>
+	</s:Group>
+	
+	<cdg:CustomDataGrid id="listDG">
+		<cdg:columns>
+			<s:ArrayList>
+				<s:GridColumn dataField="flavor_id" headerText="flavor_id"></s:GridColumn>   
+				<s:GridColumn dataField="flavor_osid" headerText="flavor_osid"></s:GridColumn>
+				<s:GridColumn dataField="flavor_name" headerText="flavor_name"></s:GridColumn>
+				<s:GridColumn dataField="flavor_vcpus" headerText="flavor_vcpus"></s:GridColumn>
+				<s:GridColumn dataField="flavor_ram" headerText="flavor_ram"></s:GridColumn>
+				<s:GridColumn dataField="flavor_rootdisk" headerText="flavor_rootdisk"></s:GridColumn>
+				<s:GridColumn dataField="flavor_ephemeraldisk" headerText="flavor_ephemeraldisk"></s:GridColumn>
+				<s:GridColumn dataField="flavor_swapdisk" headerText="flavor_swapdisk"></s:GridColumn>
+			</s:ArrayList>
+		</cdg:columns>
+	</cdg:CustomDataGrid>
+	
+</utils:MyTitleWindow>

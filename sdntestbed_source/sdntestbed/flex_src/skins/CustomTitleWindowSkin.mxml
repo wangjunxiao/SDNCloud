@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Skin xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" 
+		xmlns:mx="library://ns.adobe.com/flex/mx">
+	<!-- host component -->
+	<fx:Metadata>
+		[HostComponent("spark.components.supportClasses.SkinnableComponent")]
+	</fx:Metadata>
+	
+	<s:Rect id="tbFill"  
+			left="0"  
+			right="0"  
+			top="0"  
+			bottom="1">  
+		<s:fill>  
+			<!--The pop-up header is the picture-->  
+			<s:BitmapFill source="@Embed(source='img/titlewindows.gif')">  
+			</s:BitmapFill>  
+			
+			<!--<s:LinearGradient rotation="90">  
+				<s:GradientEntry color="0xa9bde5"
+				color.inactiveGroup="0xa9bde5"/>  
+				<s:GradientEntry color="0xa9bde5"  
+				color.inactiveGroup="0xa9bde5"/>  
+			</s:LinearGradient>  -->
+			
+		</s:fill>  
+	</s:Rect>  
+	
+</s:Skin>

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Vnet_floatingip">
+
+	<typeAlias alias="Vnet_floatingip" type="cn.dlut.entity.Vnet_floatingip" />
+
+	<resultMap class="Vnet_floatingip" id="Vnet_floatingip">
+		<result property="floatingip_id" column="floatingip_id" />
+		<result property="floatingip_addr" column="floatingip_addr" />
+		<result property="floatingip_status" column="floatingip_status" />
+		<result property="floatingip_osid" column="floatingip_osid" />
+	</resultMap>
+
+	<select id="getAll" resultClass="Vnet_floatingip">
+		select * from vnet_floatingip
+	</select>
+	
+	<update id="setDownById" parameterClass="Integer">
+		update vnet_floatingip
+		set floatingip_status="DOWN"
+		where floatingip_id=#floatingip_id#
+	</update>
+
+	<select id="getById" resultClass="Vnet_floatingip" parameterClass="Integer">
+		select *
+		from vnet_floatingip
+		where floatingip_id=#floatingip_id#
+		
+	</select>
+
+	<select id="getRandomFloatingip" resultClass="Vnet_floatingip" parameterClass="String">
+		select * 
+		from vnet_floatingip
+		where floatingip_status=#floatingip_status#
+		limit 0,1
+	</select>
+	
+	<update id="updateFloatingip" parameterClass="Vnet_floatingip">
+		update vnet_floatingip
+		set floatingip_status=#floatingip_status#
+		where floatingip_addr=#floatingip_addr#	
+	</update>
+	
+	<update id="updateFloatingipByOsid" parameterClass="Vnet_floatingip">
+	
+		update vnet_floatingip
+		set floatingip_status=#floatingip_status#
+		where floatingip_osid=#floatingip_osid#
+	
+	</update>
+	
+	<insert id="insertFloatingip" parameterClass="Vnet_floatingip">
+		insert into
+		vnet_floatingip(floatingip_addr,floatingip_status,floatingip_osid)
+		values(#floatingip_addr#,#floatingip_status#,#floatingip_osid#)
+	</insert>
+
+	<delete id="delById" parameterClass="Integer">
+		delete from vnet_floatingip where floatingip_id=#floatingip_id#
+		
+	</delete>
+	
+	<select id="getByOsid" resultClass="Vnet_floatingip" parameterClass="String">
+		
+		select * from sdn.vnet_floatingip
+		where floatingip_osid=#floatingip_osid#	
+
+	</select>
+	
+	<select id="getbyControllerid" resultClass="Vnet_floatingip" parameterClass="String">
+		select vnet_floatingip.* 
+		from (select * from sdn.vnet_controller
+ 		where vnet_controller.controller_id=#controller_id#) as A
+		inner join sdn.vnet_floatingip
+		on vnet_floatingip.floatingip_id=A.floatingip_id
+	</select>
+	
+	<select id="getbyInsid" resultClass="Vnet_floatingip" parameterClass="String">
+		select vnet_floatingip.* from
+		(select vnet_controller.* from
+		(select * from sdn.vnet_instance_controller
+		where vnet_instance_controller.instance_id=#ins_id#) as A
+		inner join sdn.vnet_controller on A.controller_id=vnet_controller.controller_id) as B
+		inner join sdn.vnet_floatingip on B.floatingip_id=vnet_floatingip.floatingip_id
+	</select>
+	
+	<select id="gethostfloatipbyInsid" resultClass="Vnet_floatingip" parameterClass="String">
+		select vnet_floatingip.* from
+		(select vnet_host.* from
+		(select * from sdn.vnet_instance_host
+		where vnet_instance_host.instance_id=#ins_id#) as A
+		inner join sdn.vnet_host on A.host_id=vnet_host.host_id) as B
+		inner join sdn.vnet_floatingip on B.floatingip_id=vnet_floatingip.floatingip_id
+	</select>
+	
+	
+</sqlMap>

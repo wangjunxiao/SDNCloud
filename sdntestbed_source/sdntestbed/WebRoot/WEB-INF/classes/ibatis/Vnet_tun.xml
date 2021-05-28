@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="Vnet_tun">
+
+	<typeAlias alias="Vnet_tun" type="cn.dlut.entity.Vnet_tun" />
+
+	<resultMap class="Vnet_tun" id="Vnet_tun">
+		<result property="tun_id" column="tun_id" />
+		<result property="tun_tag" column="tun_tag" />
+		<result property="tun_status" column="tun_status" />
+
+
+	</resultMap>
+
+	<select id="getAll" resultClass="Vnet_tun">
+		select * from vnet_tun
+	</select>
+	
+	<update id="updateTun" parameterClass="Vnet_tun">
+		update vnet_tun
+		set tun_status=#tun_status#
+		where tun_id=#tun_id#
+	</update>
+	
+	<select id="getById" resultClass="Vnet_tun" parameterClass="Integer" >
+		select * from vnet_tun where tun_id=#tun_id#
+	</select>
+	
+	<insert id="insertTun" parameterClass="Vnet_tun">
+		insert into
+		vnet_tun(tun_tag,tun_status)
+		values(#tun_tag#,#tun_status#)
+	</insert>
+	
+	<delete id="delById" parameterClass="Integer">
+		delete from vnet_tun where tun_id=#tun_id#	
+	</delete>
+	
+	<select id="getRandom" resultClass="Vnet_tun" parameterClass="String">
+		select * 
+		from vnet_tun
+		where tun_status=#tun_status#
+		limit 0,1
+	</select>
+	
+</sqlMap>

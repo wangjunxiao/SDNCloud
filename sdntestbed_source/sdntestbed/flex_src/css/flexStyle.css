@@ -1,0 +1,49 @@
+/* CSS file */
+@namespace s "library://ns.adobe.com/flex/spark";
+@namespace mx "library://ns.adobe.com/flex/mx";
+
+.ChineseFont
+{
+	fontFamily:"Verdana","����";
+	fontSize:12;    
+	
+	fontStyle:"normal";  
+	fontWeight:"normal"; 
+}
+
+/*s|Panel {
+	chromeColor:#1d6dab;
+	skinClass:"skins.CustomPanelSkin";
+}
+
+s|HSlider{
+	dataTipPrecison:0;
+}
+
+s|ButtonBar s|ToggleButton:upAndSelected,
+s|ButtonBar s|ToggleButton:overAndSelected,
+s|ButtonBar s|ToggleButton:downAndSelected,
+
+s|ButtonBar s|ToggleButton:disabledAndSelected {
+	baseColor: #FF6633;
+	color: #FFFFCC;
+}
+
+s|ButtonBar {
+	baseColor: #FFFFCC;
+}
+
+s|Button {
+	baseColor: #000000;
+	color: #269d6c;
+}
+
+s|VGroup s|Label {
+	fontWeight: "bold";
+	color: #336699;
+}
+
+s|VGroup mx|Text {
+	color: #0A436B;
+	fontWeight: "bold";
+}*/
