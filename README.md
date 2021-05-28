@@ -4,9 +4,9 @@
 >![overview](overview.PNG)
 >
 
-Network bussiness simulation, a mirror testbed of exsiting bussiness running in product can be easily orchestrated from the scratch. The experiment conducted in the shadow environment will not only safeguard exsiting bussiness, but also be migrated into product environment conveniently.
+The sdntestbed is a OpenStack based sdn testbed platform, developed by vnetlab team in dlut. The sdntestbed is used for network business simulation, to build a mirror testbed of exsiting in-product business. The experiment conducted in the shadow environment will not only safeguard exsiting bussiness, but also be migrated into product environment conveniently.
 
-The sdntestbed is a OpenStack based sdn testbed platform, developed by vnetlab team in dlut. You can deploy the sdntestbed on a OpenStack cluster with nodes connected by a simple L2 commodity switch. On the platform, each user can define a vnet, consists of virtual sdn controllers, sdn switches, links and hosts with isolated operating system.
+You can deploy the sdntestbed on a OpenStack cluster with nodes connected by a simple L2 commodity switch. On the platform, each user can define a vnet, consists of virtual sdn controllers, sdn switches, links and hosts with isolated operating system.
 
 # Features
 
