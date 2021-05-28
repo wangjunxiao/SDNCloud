@@ -1,18 +1,30 @@
-#Prerequisites
+# Prerequisites
 
-Minimal Runtime Environment  
+#### Minimal Runtime Environment  
 1. Hardware:  
-(a) x86 Server * 3 for deploying OpenStack node, in which 2 server with more memory and cpu capacity as compute node, 1 server with more nic and disk capacity as control node, network node and storage node  
-(b) Web Server * 1 for deploying sdntestbed project and project's database  
-(c) Commodity L2 Switch * 1 for connecting all server together  
+
+(a) x86 Server * 3 with OpenStack nodes deployed, in which 2 server with more memory and cpu capacity as compute nodes, 1 server with more nic and disk capacity as the control node, network node and storage node  
+
+(b) Web Server * 1 with sdntestbed project and project's database deployed  
+
+(c) Commodity L2 Switch * 1 for connecting all servers together  
+
 2. Software:  
+
 (a) Database: Mysql Server, create project's database by vnetdb.sql
+
 (b) Web: Jre and Tomcat  
+
 (c) OpenStack: kilo version  
+
 3. Script:  
+
 (a) deleteopenstack_heat.sql: clear zombie stack in OpenStack database  
+
 (b) deleteopenstack_nova.sql: clear zombie instance in OpenStack database  
+
 (c) clear /var/lib/nova/instances/{Instance ID} in compute node  
+
 (d) deleteSDNall.txt: clear project's database  
 
 #Configuration
@@ -98,7 +110,7 @@ apache-tomcat-6.0.44-green\webapps\sdn\WEB-INF\classes\constans.properties:
 
 
 
-#Start Up
+# Start Up
 
 1. run rpcserver.py in python/novaconsole-master/ at all OpenStack compute node as agent deamon to interact with ovs
 
@@ -119,6 +131,6 @@ apache-tomcat-6.0.44-green\webapps\sdn\WEB-INF\classes\constans.properties:
     ovs-vsctl add-port v v-tun -- set interface v-tun type=gre options:df_default=true options:in_key=flow options:local_ip=dst_ip options:out_key=flow options:remote_ip=src_ip
 
 
-#Credits
+# Credits
 
 1. apache tomcat 2. blazeds 3. OpenStack
