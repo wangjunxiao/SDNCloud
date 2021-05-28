@@ -27,7 +27,7 @@
 
 (d) deleteSDNall.txt: clear project's database  
 
-#Configuration
+# Configuration
 
 apache-tomcat-6.0.44-green\webapps\sdn\WEB-INF\classes\config.properties:
 
