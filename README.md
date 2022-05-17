@@ -1,7 +1,7 @@
 ### Overview
 
 
-![overview](overview.PNG =100x)
+![overview](overview.PNG =x100)
 
 
 The sdntestbed is a OpenStack based sdn testbed platform, developed by vnetlab team in dlut. The platform is used for network business simulation, to build a mirror testbed of exsiting in-product business. The experiment conducted in the shadow environment will not only safeguard existing business, but also be migrated into product environment conveniently.
